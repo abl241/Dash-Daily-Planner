@@ -48,7 +48,7 @@ export default function DropdownChecklist({ options, selectedOptions, onChange }
         <div ref={dropdownRef} className={s.dropdownChecklist}>
             <button onClick={() => setIsOpen(!isOpen)} className={s.button} type="button">
                 <span>{getDisplayText()}</span>
-                <span className={s.arrow}>▼</span>
+                <span className={`${s.arrow} ${isOpen ? s.open : ""}`}>▼</span>
             </button>
             {isOpen && (
                 <div className={s.optionsContainer}>
