@@ -153,20 +153,42 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
     const handleTimeChange = (field, part, min, max) => (e) => {
         const val = e.target.value.replace(/\D/g, "");
         if (val === "" || (Number(val) >= min && Number(val) <= max)) {
-            setFormData((prev) => ({
+            setTempDate((prev) => ({
                 ...prev,
                 [field]: { ...prev[field], [part]: val },
             }));
         }
     };
 
+    const handleTimePadBlur = (field, part) => () => {
+        setTempDate((prev) => {
+            const current = prev[field] || {};
+            let updated = { ...current };
+            const prevPart = current[part] ?? "";
+
+            if (prevPart !== "") updated[part] = pad(prevPart);
+
+            const newTemp = { ...prev, [field]: updated };
+            setFormData(newTemp);
+            return newTemp;
+        });
+    };
+
+    const handlePeriodChange = (field) => (e) => {
+        const value = e.target.value;
+        setTempDate((prev) => ({
+            ...prev,
+            [field]: { ...prev[field], period: value },
+        }));
+    }
+
     // Preserve form data when modal is closed and reopened
     useEffect(() => {
-    if (isOpen) {
-        setFormData(savedForm.current);
-    } else {
-        savedForm.current = formData;
-    }
+        if (isOpen) {
+            setFormData(savedForm.current);
+        } else {
+            savedForm.current = formData;
+        }
     }, [isOpen]);
 
 
@@ -236,10 +258,10 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                         /
                                         <input className={`${s.time} ${s.YYYY}`} placeholder="YYYY" name="dueDateYYYY" value={tempDate.dueDate.year} onChange={handleTempChange("dueDate", "year")} onBlur={handlePadBlur("dueDate", "year")} maxLength={4} inputMode="numeric"/>
                                         at
-                                        <input className={`${s.time} ${s.Hour}`} placeholder="HH" name="dueDateHour" value={tempDate.dueDate.hour} onChange={handleTimeChange("dueDate", "hour", 1, 12)} onBlur={handlePadBlur("dueDate", "hour")} maxLength={2} inputMode="numeric"/>
+                                        <input className={`${s.time} ${s.Hour}`} placeholder="HH" name="dueDateHour" value={tempDate.dueDate.hour} onChange={handleTimeChange("dueDate", "hour", 1, 12)} onBlur={handleTimePadBlur("dueDate", "hour")} maxLength={2} inputMode="numeric"/>
                                         :
-                                        <input className={`${s.time} ${s.Minute}`} placeholder="MM" name="dueDateMinute" value={tempDate.dueDate.minute} onChange={handleTimeChange("dueDate", "minute", 0, 59)} onBlur={handlePadBlur("dueDate", "minute")} maxLength={2} inputMode="numeric"/>
-                                        <select>
+                                        <input className={`${s.time} ${s.Minute}`} placeholder="MM" name="dueDateMinute" value={tempDate.dueDate.minute} onChange={handleTimeChange("dueDate", "minute", 0, 59)} onBlur={handleTimePadBlur("dueDate", "minute")} maxLength={2} inputMode="numeric"/>
+                                        <select value={tempDate.dueDate.period} onChange={handlePeriodChange("dueDate")}>
                                             <option value="AM" selected={tempDate.startTime.period === "AM"}>AM</option>
                                             <option value="PM" selected={tempDate.startTime.period === "PM"}>PM</option>
                                         </select>
@@ -260,10 +282,10 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                         /
                                         <input className={`${s.time} ${s.YYYY}`} placeholder="YYYY" name="startTimeYYYY" value={tempDate.startTime.year} onChange={handleTempChange("startTime", "year")} onBlur={handlePadBlur("startTime", "year")} maxLength={4} inputMode="numeric"/>
                                         at
-                                        <input className={`${s.time} ${s.Hour}`} placeholder="HH" name="startTimeHour" value={tempDate.startTime.hour} onChange={handleTimeChange("startTime", "hour", 1, 12)} onBlur={handlePadBlur("startTime", "hour")} maxLength={2} inputMode="numeric"/>
+                                        <input className={`${s.time} ${s.Hour}`} placeholder="HH" name="startTimeHour" value={tempDate.startTime.hour} onChange={handleTimeChange("startTime", "hour", 1, 12)} onBlur={handleTimePadBlur("startTime", "hour")} maxLength={2} inputMode="numeric"/>
                                         :
-                                        <input className={`${s.time} ${s.Minute}`} placeholder="MM" name="startTimeMinute" value={tempDate.startTime.minute} onChange={handleTimeChange("startTime", "minute", 0, 59)} onBlur={handlePadBlur("startTime", "minute")} maxLength={2} inputMode="numeric"/>
-                                        <select>
+                                        <input className={`${s.time} ${s.Minute}`} placeholder="MM" name="startTimeMinute" value={tempDate.startTime.minute} onChange={handleTimeChange("startTime", "minute", 0, 59)} onBlur={handleTimePadBlur("startTime", "minute")} maxLength={2} inputMode="numeric"/>
+                                        <select value={tempDate.startTime.period} onChange={handlePeriodChange("startTime")}>
                                             <option value="AM" selected={tempDate.startTime.period === "AM"}>AM</option>
                                             <option value="PM" selected={tempDate.startTime.period === "PM"}>PM</option>
                                         </select>
@@ -278,10 +300,10 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                         /
                                         <input className={`${s.time} ${s.YYYY}`} placeholder="YYYY" name="endTimeYYYY" value={tempDate.endTime.year} onChange={handleTempChange("endTime", "year")} onBlur={handlePadBlur("endTime", "year")} maxLength={4} inputMode="numeric"/>
                                         at
-                                        <input className={`${s.time} ${s.Hour}`} placeholder="HH" name="endTimeHour" value={tempDate.endTime.hour} onChange={handleTimeChange("endTime", "hour", 1, 12)} onBlur={handlePadBlur("endTime", "hour")} maxLength={2} inputMode="numeric"/>
+                                        <input className={`${s.time} ${s.Hour}`} placeholder="HH" name="endTimeHour" value={tempDate.endTime.hour} onChange={handleTimeChange("endTime", "hour", 1, 12)} onBlur={handleTimePadBlur("endTime", "hour")} maxLength={2} inputMode="numeric"/>
                                         :
-                                        <input className={`${s.time} ${s.Minute}`} placeholder="MM" name="endTimeMinute" value={tempDate.endTime.minute} onChange={handleTimeChange("endTime", "minute", 0, 59)} onBlur={handlePadBlur("endTime", "minute")} maxLength={2} inputMode="numeric"/>
-                                        <select>
+                                        <input className={`${s.time} ${s.Minute}`} placeholder="MM" name="endTimeMinute" value={tempDate.endTime.minute} onChange={handleTimeChange("endTime", "minute", 0, 59)} onBlur={handleTimePadBlur("endTime", "minute")} maxLength={2} inputMode="numeric"/>
+                                        <select value={tempDate.endTime.period} onChange={handlePeriodChange("endTime")}>
                                             <option value="AM" selected={tempDate.startTime.period === "AM"}>AM</option>
                                             <option value="PM" selected={tempDate.startTime.period === "PM"}>PM</option>
                                         </select>
@@ -307,15 +329,19 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                             </select>
                                         </div>
                                         <div>
-                                            <label>On</label>
-                                            <DropdownChecklist
-                                                options={["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]}
-                                                selectedOptions={formData.repeatRules.selectedDays}
-                                                onChange={(days) => setFormData(prev => ({...prev, repeatDays: days}))}
-                                            />
+                                            {formData.repeatRules.unit === "week(s)" && (
+                                                <>
+                                                    <label>On</label>
+                                                    <DropdownChecklist
+                                                        options={["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]}
+                                                        selectedOptions={formData.repeatRules.selectedDays}
+                                                        onChange={(days) => setFormData(prev => ({...prev, repeatDays: days}))}
+                                                    />
+                                                </>
+                                            )}
                                         </div>
                                     </div>
-                                    <Button onClick={()=> console.log(formData)}>Log formData</Button>
+                                    <Button onClick={()=> console.log(tempDate)}>Log formData</Button>
                                 </>
                             )}
                         </div>
