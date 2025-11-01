@@ -39,9 +39,11 @@ export default function DropdownChecklist({ options, selectedOptions, onChange }
 
     const getDisplayText = () => {
         if(selected.length === 0) return "Select options";
-        if(selected.length === 1) return selected[0];
-        if(selected.length <= 5) return selected.join(", ");
-        return `${selected.length} options selected`;
+
+        const orderedSelected = [...selected].sort((a, b) => options.indexOf(a) - options.indexOf(b));
+        if(orderedSelected.length === 1) return orderedSelected[0];
+        if(orderedSelected.length <= 3) return orderedSelected.join(", ");
+        return `${orderedSelected.length} options selected`;
     };
 
     return (
