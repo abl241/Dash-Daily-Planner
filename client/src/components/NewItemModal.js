@@ -253,13 +253,13 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                     <label>Due Date</label>
                                     <div>
                                         <input className={`${s.time} ${s.MM}`} placeholder="MM" name="dueDateMM" value={tempDate.dueDate.month} onChange={handleTempChange("dueDate", "month")} onBlur={handlePadBlur("dueDate", "month")} maxLength={2} inputMode="numeric"/>
-                                        /
+                                        <p>/</p>
                                         <input className={`${s.time} ${s.DD}`} placeholder="DD" name="dueDateDD" value={tempDate.dueDate.day} onChange={handleTempChange("dueDate", "day")} onBlur={handlePadBlur("dueDate", "day")} maxLength={2} inputMode="numeric"/>
-                                        /
+                                        <p>/</p>
                                         <input className={`${s.time} ${s.YYYY}`} placeholder="YYYY" name="dueDateYYYY" value={tempDate.dueDate.year} onChange={handleTempChange("dueDate", "year")} onBlur={handlePadBlur("dueDate", "year")} maxLength={4} inputMode="numeric"/>
-                                        at
+                                        <p>at</p>
                                         <input className={`${s.time} ${s.Hour}`} placeholder="HH" name="dueDateHour" value={tempDate.dueDate.hour} onChange={handleTimeChange("dueDate", "hour", 1, 12)} onBlur={handleTimePadBlur("dueDate", "hour")} maxLength={2} inputMode="numeric"/>
-                                        :
+                                        <p>:</p>
                                         <input className={`${s.time} ${s.Minute}`} placeholder="MM" name="dueDateMinute" value={tempDate.dueDate.minute} onChange={handleTimeChange("dueDate", "minute", 0, 59)} onBlur={handleTimePadBlur("dueDate", "minute")} maxLength={2} inputMode="numeric"/>
                                         <select value={tempDate.dueDate.period} onChange={handlePeriodChange("dueDate")}>
                                             <option value="AM" selected={tempDate.startTime.period === "AM"}>AM</option>
@@ -277,13 +277,13 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                     <label>Start Time</label>
                                     <div>
                                         <input className={`${s.time} ${s.MM}`} placeholder="MM" name="startTimeMM" value={tempDate.startTime.month} onChange={handleTempChange("startTime", "month")} onBlur={handlePadBlur("startTime", "month")} maxLength={2} inputMode="numeric"/>
-                                        /
+                                        <p>/</p>
                                         <input className={`${s.time} ${s.DD}`} placeholder="DD" name="startTimeDD" value={tempDate.startTime.day} onChange={handleTempChange("startTime", "day")} onBlur={handlePadBlur("startTime", "day")} maxLength={2} inputMode="numeric"/>
-                                        /
+                                        <p>/</p>
                                         <input className={`${s.time} ${s.YYYY}`} placeholder="YYYY" name="startTimeYYYY" value={tempDate.startTime.year} onChange={handleTempChange("startTime", "year")} onBlur={handlePadBlur("startTime", "year")} maxLength={4} inputMode="numeric"/>
-                                        at
+                                        <p>at</p>
                                         <input className={`${s.time} ${s.Hour}`} placeholder="HH" name="startTimeHour" value={tempDate.startTime.hour} onChange={handleTimeChange("startTime", "hour", 1, 12)} onBlur={handleTimePadBlur("startTime", "hour")} maxLength={2} inputMode="numeric"/>
-                                        :
+                                        <p>:</p>
                                         <input className={`${s.time} ${s.Minute}`} placeholder="MM" name="startTimeMinute" value={tempDate.startTime.minute} onChange={handleTimeChange("startTime", "minute", 0, 59)} onBlur={handleTimePadBlur("startTime", "minute")} maxLength={2} inputMode="numeric"/>
                                         <select value={tempDate.startTime.period} onChange={handlePeriodChange("startTime")}>
                                             <option value="AM" selected={tempDate.startTime.period === "AM"}>AM</option>
@@ -295,13 +295,13 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                     <label>End Time</label>
                                     <div>
                                         <input className={`${s.time} ${s.MM}`} placeholder="MM" name="endTimeMM" value={tempDate.endTime.month} onChange={handleTempChange("endTime", "month")} onBlur={handlePadBlur("endTime", "month")} maxLength={2} inputMode="numeric"/>
-                                        /
+                                        <p>/</p>
                                         <input className={`${s.time} ${s.DD}`} placeholder="DD" name="endTimeDD" value={tempDate.endTime.day} onChange={handleTempChange("endTime", "day")} onBlur={handlePadBlur("endTime", "day")} maxLength={2} inputMode="numeric"/>
-                                        /
+                                        <p>/</p>
                                         <input className={`${s.time} ${s.YYYY}`} placeholder="YYYY" name="endTimeYYYY" value={tempDate.endTime.year} onChange={handleTempChange("endTime", "year")} onBlur={handlePadBlur("endTime", "year")} maxLength={4} inputMode="numeric"/>
-                                        at
+                                        <p>at</p>
                                         <input className={`${s.time} ${s.Hour}`} placeholder="HH" name="endTimeHour" value={tempDate.endTime.hour} onChange={handleTimeChange("endTime", "hour", 1, 12)} onBlur={handleTimePadBlur("endTime", "hour")} maxLength={2} inputMode="numeric"/>
-                                        :
+                                        <p>:</p>
                                         <input className={`${s.time} ${s.Minute}`} placeholder="MM" name="endTimeMinute" value={tempDate.endTime.minute} onChange={handleTimeChange("endTime", "minute", 0, 59)} onBlur={handleTimePadBlur("endTime", "minute")} maxLength={2} inputMode="numeric"/>
                                         <select value={tempDate.endTime.period} onChange={handlePeriodChange("endTime")}>
                                             <option value="AM" selected={tempDate.startTime.period === "AM"}>AM</option>
@@ -317,31 +317,57 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                             <Button className={s.repeatAndReminderButton} onClick={() => setRepeat(!repeat)} variant="toggle" selfToggle>Repeat?</Button>
                             {repeat && (
                                 <>
-                                    <div>
-                                        <div className={s.intervalRules}>
-                                            <label>Every</label>
-                                            <input className={s.repeatInterval} name="repeatRules.interval" value={formData.repeatRules.interval} onChange={handleChange} placeholder="#"/> {/* need to make input checks, onblur thing */}
-                                            <select className={s.repeatUnit} name="repeatRules.unit" value={formData.repeatRules.unit} onChange={handleChange}> {/* repeat unit */}
-                                                <option value="day(s)">day(s)</option> {/* make pluralization logic later */}
-                                                <option value="week(s)">week(s)</option>
-                                                <option value="month(s)">month(s)</option>
-                                                <option value="year(s)">year(s)</option>
-                                            </select>
-                                        </div>
+                                    <div className={s.repeatAndReminderContainer}>
                                         <div>
-                                            {formData.repeatRules.unit === "week(s)" && (
-                                                <>
-                                                    <label>On</label>
-                                                    <DropdownChecklist
-                                                        options={["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]}
-                                                        selectedOptions={formData.repeatRules.selectedDays}
-                                                        onChange={(days) => setFormData(prev => ({...prev, repeatDays: days}))}
-                                                    />
-                                                </>
-                                            )}
+                                            <div className={s.intervalRules}>
+                                                <label>Every</label>
+                                                <input className={s.repeatInterval} name="repeatRules.interval" value={formData.repeatRules.interval} onChange={handleChange} placeholder="#"/> {/* need to make input checks, onblur thing */}
+                                                <select className={s.repeatUnit} name="repeatRules.unit" value={formData.repeatRules.unit} onChange={handleChange}> {/* repeat unit */}
+                                                    <option value="day(s)">day(s)</option> {/* make pluralization logic later */}
+                                                    <option value="week(s)">week(s)</option>
+                                                    <option value="month(s)">month(s)</option>
+                                                    <option value="year(s)">year(s)</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                {formData.repeatRules.unit === "week(s)" && (
+                                                    <>
+                                                        <div className={s.repeatDays}>
+                                                            <label>On</label>
+                                                            <DropdownChecklist
+                                                                options={["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]}
+                                                                selectedOptions={formData.repeatRules.selectedDays}
+                                                                onChange={(days) => setFormData(prev => ({...prev, repeatDays: days}))}
+                                                            />
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
                                         </div>
+                                        <div className={s.endRepeatContainer}>
+                                            <label>Ends</label>
+                                            <div>
+                                                <Button className={s.circleButton} variant="toggle" selfToggle></Button>
+                                                <p>Never</p>
+                                            </div>
+                                            <div>
+                                                <Button className={s.circleButton} variant="toggle" selfToggle></Button>
+                                                <p>After</p>
+                                                <input></input>
+                                                <p>times</p>
+                                            </div>
+                                            <div>
+                                                <Button className={s.circleButton} variant="toggle" selfToggle></Button>
+                                                <p>On</p>
+                                                <input></input>
+                                                <p>/</p>
+                                                <input></input>
+                                                <p>/</p>
+                                                <input></input>
+                                            </div>
+                                        </div>
+                                        <Button onClick={()=> console.log(tempDate)}>Log formData</Button>
                                     </div>
-                                    <Button onClick={()=> console.log(tempDate)}>Log formData</Button>
                                 </>
                             )}
                         </div>
