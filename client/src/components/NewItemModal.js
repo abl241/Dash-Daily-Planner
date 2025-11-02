@@ -314,7 +314,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                     )}
                     <div className={s.repeatAndReminders}>
                         <div className={s.labelInputPair}> {/* repeat */}
-                            <Button className={s.repeatAndReminderButton} onClick={() => setRepeat(!repeat)} variant="toggle" selfToggle>Repeat?</Button>
+                            <Button className={s.repeatAndReminderButton} onClick={() => setRepeat(!repeat)} variant="toggle" toggled={repeat}>Repeat?</Button>
                             {repeat && (
                                 <>
                                     <div className={s.repeatAndReminderContainer}>
@@ -372,7 +372,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                             )}
                         </div>
                         <div className={s.labelInputPair}> {/* reminders */}
-                            <Button onClick={() => setReminder(!reminder)} variant="toggle" selfToggle>Remind Me</Button>
+                            <Button onClick={() => setReminder(!reminder)} variant="toggle" toggled={reminder}>Remind Me</Button>
                             {reminder && (
                                 <>
                                     <div>

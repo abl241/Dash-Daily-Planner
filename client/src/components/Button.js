@@ -5,22 +5,23 @@ export default function Button({
     children,
     onClick,
     type = "button",
-    variant = "primary", // "primary" or "secondary"
-    toggled: controlledToggled,
+    variant = "primary", // "primary", "secondary", "toggle"
+    toggled = false,
     selfToggle = false,
     disabled = false,
     className = "",
  }) {
     const [internalToggled, setInternalToggled] = useState(false);
 
-    const isToggled = selfToggle ? internalToggled : controlledToggled;
+    // Use parent's toggled state if provided, otherwise use internal state
+    const isToggled = selfToggle ? internalToggled : toggled;
 
     const handleClick = (e) => {
-    if (selfToggle) {
-      setInternalToggled((prev) => !prev); // flip internal toggle
-    }
-    if (onClick) onClick(e); // still call parent handler if provided
-  };
+        if (selfToggle) {
+            setInternalToggled((prev) => !prev);
+        }
+        if (onClick) onClick(e);
+    };
 
     const toggleClass = isToggled ? s.toggledOn : s.toggledOff;
 
@@ -34,4 +35,4 @@ export default function Button({
             {children}
         </button>
     );
- };
+};
