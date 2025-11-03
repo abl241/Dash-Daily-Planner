@@ -8,6 +8,9 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
     const [type, setType] = useState("task"); // "task" or "event"
     const [repeat, setRepeat] = useState(false);
     const [reminder, setReminder] = useState(false);
+    const [endRepeatNever, setEndRepeatNever] = useState(true);
+    const [endRepeatAfter, setEndRepeatAfter] = useState(false);
+    const [endRepeatOn, setEndRepeatOn] = useState(false);
 
     const today = new Date();
     const defaultDate = {
@@ -21,7 +24,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         category: "",
         reminders: "",
         repeat: "",
-        repeatRules: {unit: "", interval: "", selectedDays: []},
+        repeatRules: {unit: "", interval: "", selectedDays: [], endRules: {type: "never", count: null, date: null}},
         link: "",
         //task specific
         dueDate: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "AM"},
@@ -181,6 +184,20 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             [field]: { ...prev[field], period: value },
         }));
     }
+
+    // Handle end repeat option toggles
+    const handleEndRuleToggle = (type) => {
+        setFormData((prev) => ({
+            ...prev, repeatRules: {
+                ...prev.repeatRules, endRules: {
+                    type: type
+                }
+            }
+        }));
+        setEndRepeatNever(type === "never");
+        setEndRepeatAfter(type === "after");
+        setEndRepeatOn(type === "on");
+    };
 
     // Preserve form data when modal is closed and reopened
     useEffect(() => {
@@ -347,17 +364,17 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                         <div className={s.endRepeatContainer}>
                                             <label>Ends</label>
                                             <div>
-                                                <Button className={s.circleButton} variant="toggle" selfToggle></Button>
+                                                <Button className={s.circleButton} variant="toggle" onClick={() => handleEndRuleToggle("never")} toggled={endRepeatNever}></Button>
                                                 <p>Never</p>
                                             </div>
                                             <div>
-                                                <Button className={s.circleButton} variant="toggle" selfToggle></Button>
+                                                <Button className={s.circleButton} variant="toggle" onClick={() => handleEndRuleToggle("after")} toggled={endRepeatAfter}></Button>
                                                 <p>After</p>
                                                 <input></input>
                                                 <p>times</p>
                                             </div>
                                             <div>
-                                                <Button className={s.circleButton} variant="toggle" selfToggle></Button>
+                                                <Button className={s.circleButton} variant="toggle" onClick={() => handleEndRuleToggle("on")} toggled={endRepeatOn}></Button>
                                                 <p>On</p>
                                                 <input></input>
                                                 <p>/</p>
