@@ -21,6 +21,7 @@
 
 .optionsBtn {
     background: none;
+    align-self: center;
     border: none;
     font-size: 1.3rem;
     cursor: pointer;
@@ -30,6 +31,13 @@
 .optionsBtn:hover {
     transform: scale(1.05);
     color: var(--primary-color);
+}
+
+.logo {
+    height: 2.5rem;
+    width: auto;
+    margin-right: 1rem;
+    align-self: center;
 }
 
 .navTabs {

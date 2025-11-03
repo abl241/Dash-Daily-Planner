@@ -25,57 +25,51 @@ export default function Header() {
         day: "numeric",
     });
     setDate(formatted);
-  }, []);
+}, []);
 
   return (
-    <header className={s.header}>
-      {/* LEFT SIDE */}
-      <div className={s.left}>
-        <button className={s.optionsBtn}>
-          <FaBars />
-        </button>
+      <header className={s.header}>
+            {/* LEFT SIDE */}
+            <div className={s.left}>
+                <button className={s.optionsBtn}>
+                    <FaBars />
+                </button>
+                <img src="/logo.svg" alt="App Logo" className={s.logo}/>
+            </div>
+            <nav className={s.navTabs}>
+                <NavLink
+                    to="/dash/dashboard"
+                    className={({ isActive }) =>
+                        isActive ? `${s.tab} ${s.active}` : s.tab
+                    }
+                >Dashboard</NavLink>
+                <NavLink
+                    to="/dash/calendar"
+                    className={({ isActive }) =>
+                        isActive ? `${s.tab} ${s.active}` : s.tab
+                    }
+                >Calendar</NavLink>
+                <NavLink
+                    to="/dash/widgets"
+                    className={({ isActive }) =>
+                        isActive ? `${s.tab} ${s.active}` : s.tab
+                    }
+                >Widgets</NavLink>
+            </nav>
 
-        <nav className={s.navTabs}>
-          <NavLink
-            to="/dash/dashboard"
-            className={({ isActive }) =>
-              isActive ? `${s.tab} ${s.active}` : s.tab
-            }
-          >
-            Dashboard
-          </NavLink>
-          <NavLink
-            to="/dash/calendar"
-            className={({ isActive }) =>
-              isActive ? `${s.tab} ${s.active}` : s.tab
-            }
-          >
-            Calendar
-          </NavLink>
-          <NavLink
-            to="/dash/widgets"
-            className={({ isActive }) =>
-              isActive ? `${s.tab} ${s.active}` : s.tab
-            }
-          >
-            Widgets
-          </NavLink>
-        </nav>
-      </div>
+            {/* RIGHT SIDE */}
+            <div className={s.right}>
+                <div className={s.greeting}>
+                    <div className={s.greetingText}>
+                        {greeting}, <p className={s.username}>{first_name}!</p>
+                    </div>
+                    <div className={s.date}>{date}</div>
+                </div>
 
-      {/* RIGHT SIDE */}
-      <div className={s.right}>
-        <div className={s.greeting}>
-          <div className={s.greetingText}>
-            {greeting}, <p className={s.username}>{first_name}!</p>
-          </div>
-          <div className={s.date}>{date}</div>
-        </div>
-
-        <div className={s.profile}>
-          <FaUserCircle />
-        </div>
-      </div>
-    </header>
-  );
+                <div className={s.profile}>
+                    <FaUserCircle />
+                </div>
+            </div>
+        </header>
+    );
 }
