@@ -24,7 +24,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         category: "",
         reminders: "",
         repeat: "",
-        repeatRules: {unit: "", interval: "", selectedDays: [], endRules: {type: "never", count: null, date: null}},
+        repeatRules: {unit: "", interval: "", selectedDays: [], endRules: {type: "never", count: null, month: defaultDate.month, day: defaultDate.day, year: defaultDate.year}},
         link: "",
         //task specific
         dueDate: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "AM"},
@@ -197,6 +197,42 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         setEndRepeatNever(type === "never");
         setEndRepeatAfter(type === "after");
         setEndRepeatOn(type === "on");
+    };
+
+    // Handle end repeat date input change
+    const handleTempEndDateChange = (part) => (e) => {
+        const val = e.target.value.replace(/\D/g, "");
+        if (val === "" || val.length <= (part === "year" ? 4 : 2)) {
+            setTempDate((prev) => ({
+                ...prev, repeatRules: {
+                    ...prev.repeatRules, endRules: {
+                        ...prev.repeatRules.endRules, [part]: val
+                    }
+                }
+            }));
+        }
+    };
+
+    const handleEndDatePadBlur = (part) => () => {
+        setTempDate((prev) => {
+            const current = prev.repeatRules.endRules || {};
+            const prevPart = current[part] ?? "";
+            let updated = { ...current };
+
+            if (prevPart !== "") {
+                updated[part] = part === "year" ? padYear(prevPart) : pad(prevPart);
+            }
+            const { day, month, year } = updated;
+            if (day && month && year) {
+                updated = normalizeDate(updated);
+            }
+
+            const newTemp = { ...prev, repeatRules: {
+                ...prev.repeatRules, endRules: updated
+            }};
+            setFormData(newTemp);
+            return newTemp;
+        });
     };
 
     // Preserve form data when modal is closed and reopened
@@ -376,11 +412,11 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                             <div>
                                                 <Button className={s.circleButton} variant="toggle" onClick={() => handleEndRuleToggle("on")} toggled={endRepeatOn}></Button>
                                                 <p>On</p>
-                                                <input></input>
+                                                <input className={`${s.time} ${s.MM}`} placeholder="MM" name="endRepeatMM" value={tempDate.repeatRules.endRules.month} onChange={handleTempEndDateChange("month")} onBlur={handleEndDatePadBlur("month")} maxLength={2} inputMode="numeric"/>
                                                 <p>/</p>
-                                                <input></input>
+                                                <input className={`${s.time} ${s.DD}`} placeholder="DD" name="endRepeatDD" value={tempDate.repeatRules.endRules.day} onChange={handleTempEndDateChange("day")} onBlur={handleEndDatePadBlur("day")} maxLength={2} inputMode="numeric"/>
                                                 <p>/</p>
-                                                <input></input>
+                                                <input className={`${s.time} ${s.YYYY}`} placeholder="YYYY" name="endRepeatYYYY" value={tempDate.repeatRules.endRules.year} onChange={handleTempEndDateChange("year")} onBlur={handleEndDatePadBlur("year")} maxLength={4} inputMode="numeric"/>
                                             </div>
                                         </div>
                                         <Button onClick={()=> console.log(tempDate)}>Log formData</Button>

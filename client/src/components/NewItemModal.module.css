@@ -223,8 +223,3 @@ select:focus {
     align-items: center;
     gap: 0.5rem;
 }
-
-.endRepeatContainer input {
-    max-width: 2rem;
-    text-align: center;
-}
