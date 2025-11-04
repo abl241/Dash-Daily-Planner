@@ -406,7 +406,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                             <div>
                                                 <Button className={s.circleButton} variant="toggle" onClick={() => handleEndRuleToggle("after")} toggled={endRepeatAfter}></Button>
                                                 <p>After</p>
-                                                <input></input>
+                                                <input className={s.endAfterInput} name="repeatRules.endRules.count" value={formData.repeatRules.endRules.count} onChange={handleChange} placeholder="#"/>
                                                 <p>times</p>
                                             </div>
                                             <div>
