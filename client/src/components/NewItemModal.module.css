@@ -218,6 +218,23 @@ select:focus {
     padding: 0;
 }
 
+.endRepeatOption {
+    color: var(--secondary-text-color);
+    display: inherit;
+    align-items: inherit;
+    gap: inherit;
+}
+
+.disabledEndRepeatOption {
+    background-color: var(--border-color);
+    color: var(--secondary-text-color);
+}
+
+.endRepeatOptionActive {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
 .endRepeatContainer > div {
     display: flex;
     align-items: center;

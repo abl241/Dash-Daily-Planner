@@ -245,7 +245,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
     }, [isOpen]);
 
 
-    const handleSubmit = (e) => { // ensure end date is after start date; no required fields are left blank; check if reminder/repeat is on or give "" values
+    const handleSubmit = (e) => { // ensure end date is after start date; no required fields are left blank; check if reminder/repeat is on or give "" values; only values for selected endrepeat rules are given
         e.preventDefault();
         onAdd(formData);
         setFormData({
@@ -401,22 +401,30 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                             <label>Ends</label>
                                             <div>
                                                 <Button className={s.circleButton} variant="toggle" onClick={() => handleEndRuleToggle("never")} toggled={endRepeatNever}></Button>
-                                                <p>Never</p>
+                                                <div className={`${s.endRepeatOption} ${endRepeatNever ? s.endRepeatOptionActive : ""} `}>
+                                                    <p>Never</p>
+                                                </div>
                                             </div>
                                             <div>
                                                 <Button className={s.circleButton} variant="toggle" onClick={() => handleEndRuleToggle("after")} toggled={endRepeatAfter}></Button>
-                                                <p>After</p>
-                                                <input className={s.endAfterInput} name="repeatRules.endRules.count" value={formData.repeatRules.endRules.count} onChange={handleChange} placeholder="#"/>
-                                                <p>times</p>
+                                                <div className={`${s.endRepeatOption} ${endRepeatAfter ? s.endRepeatOptionActive : ""} `}>
+                                                    <p>After</p>
+                                                    <input className={`${s.endAfterInput} ${endRepeatAfter ? "" : s.disabledEndRepeatOption}`} name="repeatRules.endRules.count" value={formData.repeatRules.endRules.count} onChange={handleChange} placeholder="#"/>
+                                                    <p>times</p>
+                                                </div>
                                             </div>
                                             <div>
                                                 <Button className={s.circleButton} variant="toggle" onClick={() => handleEndRuleToggle("on")} toggled={endRepeatOn}></Button>
-                                                <p>On</p>
-                                                <input className={`${s.time} ${s.MM}`} placeholder="MM" name="endRepeatMM" value={tempDate.repeatRules.endRules.month} onChange={handleTempEndDateChange("month")} onBlur={handleEndDatePadBlur("month")} maxLength={2} inputMode="numeric"/>
-                                                <p>/</p>
-                                                <input className={`${s.time} ${s.DD}`} placeholder="DD" name="endRepeatDD" value={tempDate.repeatRules.endRules.day} onChange={handleTempEndDateChange("day")} onBlur={handleEndDatePadBlur("day")} maxLength={2} inputMode="numeric"/>
-                                                <p>/</p>
-                                                <input className={`${s.time} ${s.YYYY}`} placeholder="YYYY" name="endRepeatYYYY" value={tempDate.repeatRules.endRules.year} onChange={handleTempEndDateChange("year")} onBlur={handleEndDatePadBlur("year")} maxLength={4} inputMode="numeric"/>
+                                                <div className={`${s.endRepeatOption} ${endRepeatOn ? s.endRepeatOptionActive : ""} `}>
+                                                    <p>On</p>
+                                                    <div>
+                                                        <input className={`${s.time} ${s.MM} ${endRepeatOn ? "" : s.disabledEndRepeatOption}`} placeholder="MM" name="endRepeatMM" value={tempDate.repeatRules.endRules.month} onChange={handleTempEndDateChange("month")} onBlur={handleEndDatePadBlur("month")} maxLength={2} inputMode="numeric"/>
+                                                        <p>/</p>
+                                                        <input className={`${s.time} ${s.DD} ${endRepeatOn ? "" : s.disabledEndRepeatOption}`} placeholder="DD" name="endRepeatDD" value={tempDate.repeatRules.endRules.day} onChange={handleTempEndDateChange("day")} onBlur={handleEndDatePadBlur("day")} maxLength={2} inputMode="numeric"/>
+                                                        <p>/</p>
+                                                        <input className={`${s.time} ${s.YYYY} ${endRepeatOn ? "" : s.disabledEndRepeatOption}`} placeholder="YYYY" name="endRepeatYYYY" value={tempDate.repeatRules.endRules.year} onChange={handleTempEndDateChange("year")} onBlur={handleEndDatePadBlur("year")} maxLength={4} inputMode="numeric"/>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <Button onClick={()=> console.log(tempDate)}>Log formData</Button>
