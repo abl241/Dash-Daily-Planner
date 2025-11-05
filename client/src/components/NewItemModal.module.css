@@ -272,3 +272,16 @@ select:focus {
     max-width: 3rem;
     text-align: center;
 }
+
+.reminderOptionDisabled {
+    color: var(--secondary-text-color);
+}
+
+.reminderInputDisabled {
+    background-color: var(--border-color);
+}
+
+.reminderOptionActive {
+    color: var(--text-color);
+    font-weight: 600;
+}

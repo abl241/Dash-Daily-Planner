@@ -499,27 +499,28 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                         <div className={s.reminderOptions}>
                                             <div>
                                                 <Button className={s.circleButton} onClick={() => toggleReminder(5)} variant="toggle" toggled={formData.reminders.includes(5)}/>
-                                                <p>5 minutes before</p>
+                                                <p className={`${formData.reminders.includes(5) ? s.reminderOptionActive : s.reminderOptionDisabled}`}>5 minutes before</p>
                                             </div>
                                             <div>
                                                 <Button className={s.circleButton} onClick={() => toggleReminder(30)} variant="toggle" toggled={formData.reminders.includes(30)}/>
-                                                <p>30 minutes before</p>
+                                                <p className={`${formData.reminders.includes(30) ? s.reminderOptionActive : s.reminderOptionDisabled}`}>30 minutes before</p>
                                             </div>
                                             <div>
                                                 <Button className={s.circleButton} onClick={() => toggleReminder(60)} variant="toggle" toggled={formData.reminders.includes(60)}/>
-                                                <p>1 hour before</p>
+                                                <p className={`${formData.reminders.includes(60) ? s.reminderOptionActive : s.reminderOptionDisabled}`}>1 hour before</p>
                                             </div>
                                             <div>
                                                 <Button className={s.circleButton} toggled={formData.reminders.includes(convertToMinutes(Number(customReminder), customReminderUnit))} variant="toggle" onClick={() => {
-                                                    const val = convertToMinutes   (Number(customReminder), customReminderUnit);
+                                                    const val = convertToMinutes(Number(customReminder), customReminderUnit);
                                                     if(!isNaN(val) && val > 0) toggleReminder(val);
                                                 }}/>
-                                                <input className={s.customRemindInput} value={customReminder} onChange={handleCustomReminderChange} placeholder="#" inputMode="numeric"/>
-                                                <select value={customReminderUnit} onChange={handleCustomReminderUnitChange}>
+                                                <input className={` ${s.customRemindInput} ${formData.reminders.includes(convertToMinutes(Number(customReminder), customReminderUnit)) ? "" : s.reminderInputDisabled}`} value={customReminder} onChange={handleCustomReminderChange} placeholder="#" inputMode="numeric"/>
+                                                <select className={`${formData.reminders.includes(convertToMinutes(Number(customReminder), customReminderUnit)) ? "" : s.reminderInputDisabled}`} value={customReminderUnit} onChange={handleCustomReminderUnitChange}>
                                                     <option value="minutes" >minutes</option> {/*add selected={} */}
                                                     <option value="hours" >hours</option>
+                                                    <option value="days" >days</option>
                                                 </select>
-                                                <p>before</p>
+                                                <p className={`${formData.reminders.includes(convertToMinutes(Number(customReminder), customReminderUnit)) ? s.reminderOptionActive : s.reminderOptionDisabled}`}>before</p>
                                             </div>
                                         </div>
                                     </div>
