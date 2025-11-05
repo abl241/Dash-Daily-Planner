@@ -173,7 +173,8 @@ select:focus {
 }
 
 .repeatAndReminderButton {
-    max-width: 6rem;
+    max-width: 8rem;
+    width: auto;
 }
 
 .repeatAndReminderContainer {
@@ -242,6 +243,32 @@ select:focus {
 }
 
 .endAfterInput {
+    max-width: 3rem;
+    text-align: center;
+}
+
+/* Reminder Options */
+.reminderContainer {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+}
+
+.reminderOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.reminderOptions > div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.customRemindInput {
     max-width: 3rem;
     text-align: center;
 }

@@ -11,6 +11,8 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
     const [endRepeatNever, setEndRepeatNever] = useState(true);
     const [endRepeatAfter, setEndRepeatAfter] = useState(false);
     const [endRepeatOn, setEndRepeatOn] = useState(false);
+    const [customReminder, setCustomReminder] = useState("");
+    const [customReminderUnit, setCustomReminderUnit] = useState("minutes");
 
     const today = new Date();
     const defaultDate = {
@@ -22,7 +24,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         title: "",
         notes: "",
         category: "",
-        reminders: "",
+        reminders: [],
         repeat: "",
         repeatRules: {unit: "", interval: "", selectedDays: [], endRules: {type: "never", count: null, month: defaultDate.month, day: defaultDate.day, year: defaultDate.year}},
         link: "",
@@ -244,6 +246,64 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         }
     }, [isOpen]);
 
+    // handlers for changing reminders
+    const toggleReminder = (val) => {
+        setFormData((prev) => {
+            const current = prev.reminders;
+            const isActive = current.includes(val);
+            return {
+                ...prev, reminders:
+                    isActive ? current.filter((v) => v !== val) : [...current, val]
+            };
+        });
+    };
+
+    const handleCustomReminderChange = (e) => {
+        const newVal = e.target.value;
+        setCustomReminder(newVal);
+
+        setFormData((prev) => {
+            const current = prev.reminders;
+            const oldCustomValue = convertToMinutes(Number(customReminder), customReminderUnit);
+            const withoutOld = current.filter((v) => v !== oldCustomValue);
+
+            const newCustomValue = convertToMinutes(Number(newVal), customReminderUnit);
+            if (!isNaN(newCustomValue) && newCustomValue > 0) {
+            return { ...prev, reminders: [...withoutOld, newCustomValue] };
+            }
+            return { ...prev, reminders: withoutOld };
+        });
+    };
+
+    const handleCustomReminderUnitChange = (e) => {
+        const newUnit = e.target.value;
+        setCustomReminderUnit(newUnit);
+
+        setFormData((prev) => {
+            const current = prev.reminders;
+            const oldCustomValue = convertToMinutes(Number(customReminder), customReminderUnit);
+            const withoutOld = current.filter((v) => v !== oldCustomValue);
+
+            const newCustomValue = convertToMinutes(Number(customReminder), newUnit);
+            if (!isNaN(newCustomValue) && newCustomValue > 0) {
+            return { ...prev, reminders: [...withoutOld, newCustomValue] };
+            }
+            return { ...prev, reminders: withoutOld };
+        });
+    }
+
+    const convertToMinutes = (val, unit) => {
+        switch (unit) {
+            case "minutes":
+                return val;
+            case "hours":
+                return val * 60;
+            case "days":
+                return val * 60 * 24;
+            default:
+                return val;
+        }
+    };
 
     const handleSubmit = (e) => { // ensure end date is after start date; no required fields are left blank; check if reminder/repeat is on or give "" values; only values for selected endrepeat rules are given
         e.preventDefault();
@@ -400,13 +460,13 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                         <div className={s.endRepeatContainer}>
                                             <label>Ends</label>
                                             <div>
-                                                <Button className={s.circleButton} variant="toggle" onClick={() => handleEndRuleToggle("never")} toggled={endRepeatNever}></Button>
+                                                <Button className={s.circleButton} variant="toggle" onClick={() => handleEndRuleToggle("never")} toggled={endRepeatNever}/>
                                                 <div className={`${s.endRepeatOption} ${endRepeatNever ? s.endRepeatOptionActive : ""} `}>
                                                     <p>Never</p>
                                                 </div>
                                             </div>
                                             <div>
-                                                <Button className={s.circleButton} variant="toggle" onClick={() => handleEndRuleToggle("after")} toggled={endRepeatAfter}></Button>
+                                                <Button className={s.circleButton} variant="toggle" onClick={() => handleEndRuleToggle("after")} toggled={endRepeatAfter}/>
                                                 <div className={`${s.endRepeatOption} ${endRepeatAfter ? s.endRepeatOptionActive : ""} `}>
                                                     <p>After</p>
                                                     <input className={`${s.endAfterInput} ${endRepeatAfter ? "" : s.disabledEndRepeatOption}`} name="repeatRules.endRules.count" value={formData.repeatRules.endRules.count} onChange={handleChange} placeholder="#"/>
@@ -414,7 +474,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                                 </div>
                                             </div>
                                             <div>
-                                                <Button className={s.circleButton} variant="toggle" onClick={() => handleEndRuleToggle("on")} toggled={endRepeatOn}></Button>
+                                                <Button className={s.circleButton} variant="toggle" onClick={() => handleEndRuleToggle("on")} toggled={endRepeatOn}/>
                                                 <div className={`${s.endRepeatOption} ${endRepeatOn ? s.endRepeatOptionActive : ""} `}>
                                                     <p>On</p>
                                                     <div>
@@ -427,22 +487,47 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                                 </div>
                                             </div>
                                         </div>
-                                        <Button onClick={()=> console.log(tempDate)}>Log formData</Button>
                                     </div>
                                 </>
                             )}
                         </div>
                         <div className={s.labelInputPair}> {/* reminders */}
-                            <Button onClick={() => setReminder(!reminder)} variant="toggle" toggled={reminder}>Remind Me</Button>
+                            <Button className={s.repeatAndReminderButton} onClick={() => setReminder(!reminder)} variant="toggle" toggled={reminder}>Remind Me</Button>
                             {reminder && (
                                 <>
-                                    <div>
-                                        test
+                                    <div className={s.reminderContainer}>
+                                        <div className={s.reminderOptions}>
+                                            <div>
+                                                <Button className={s.circleButton} onClick={() => toggleReminder(5)} variant="toggle" toggled={formData.reminders.includes(5)}/>
+                                                <p>5 minutes before</p>
+                                            </div>
+                                            <div>
+                                                <Button className={s.circleButton} onClick={() => toggleReminder(30)} variant="toggle" toggled={formData.reminders.includes(30)}/>
+                                                <p>30 minutes before</p>
+                                            </div>
+                                            <div>
+                                                <Button className={s.circleButton} onClick={() => toggleReminder(60)} variant="toggle" toggled={formData.reminders.includes(60)}/>
+                                                <p>1 hour before</p>
+                                            </div>
+                                            <div>
+                                                <Button className={s.circleButton} toggled={formData.reminders.includes(convertToMinutes(Number(customReminder), customReminderUnit))} variant="toggle" onClick={() => {
+                                                    const val = convertToMinutes   (Number(customReminder), customReminderUnit);
+                                                    if(!isNaN(val) && val > 0) toggleReminder(val);
+                                                }}/>
+                                                <input className={s.customRemindInput} value={customReminder} onChange={handleCustomReminderChange} placeholder="#" inputMode="numeric"/>
+                                                <select value={customReminderUnit} onChange={handleCustomReminderUnitChange}>
+                                                    <option value="minutes" >minutes</option> {/*add selected={} */}
+                                                    <option value="hours" >hours</option>
+                                                </select>
+                                                <p>before</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </>
                             )}
                         </div>
                     </div>
+                            <Button onClick={()=> console.log(tempDate)}>Log formData</Button>
                 </form>
             </div>
         </div>
