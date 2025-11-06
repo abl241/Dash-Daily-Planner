@@ -13,6 +13,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
     const [endRepeatOn, setEndRepeatOn] = useState(false);
     const [customReminder, setCustomReminder] = useState("");
     const [customReminderUnit, setCustomReminderUnit] = useState("minutes");
+    const [customReminderValue, setCustomReminderValue] = useState(null);
 
     const today = new Date();
     const defaultDate = {
@@ -260,37 +261,76 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
 
     const handleCustomReminderChange = (e) => {
         const newVal = e.target.value;
-        setCustomReminder(newVal);
-
-        setFormData((prev) => {
-            const current = prev.reminders;
-            const oldCustomValue = convertToMinutes(Number(customReminder), customReminderUnit);
-            const withoutOld = current.filter((v) => v !== oldCustomValue);
-
-            const newCustomValue = convertToMinutes(Number(newVal), customReminderUnit);
-            if (!isNaN(newCustomValue) && newCustomValue > 0) {
-            return { ...prev, reminders: [...withoutOld, newCustomValue] };
-            }
-            return { ...prev, reminders: withoutOld };
-        });
+            setCustomReminder(newVal);
+            
+            // Don't update formData here, only update tempDate for visual feedback
+            setTempDate((prev) => {
+                const current = prev.reminders;
+                // Remove the old custom value if it exists
+                const withoutOldCustom = customReminderValue !== null 
+                    ? current.filter((v) => v !== customReminderValue)
+                    : current;
+                
+                const newCustomValue = convertToMinutes(Number(newVal), customReminderUnit);
+                if (!isNaN(newCustomValue) && newCustomValue > 0) {
+                    return { ...prev, reminders: [...withoutOldCustom, newCustomValue] };
+                }
+                return { ...prev, reminders: withoutOldCustom };
+            });
     };
 
     const handleCustomReminderUnitChange = (e) => {
         const newUnit = e.target.value;
         setCustomReminderUnit(newUnit);
+        
+        setTempDate((prev) => {
+            const current = prev.reminders;
+            // Remove the old custom value if it exists
+            const withoutOldCustom = customReminderValue !== null
+                ? current.filter((v) => v !== customReminderValue)
+                : current;
+            
+            const newCustomValue = convertToMinutes(Number(customReminder), newUnit);
+            if (!isNaN(newCustomValue) && newCustomValue > 0) {
+                return { ...prev, reminders: [...withoutOldCustom, newCustomValue] };
+            }
+            return { ...prev, reminders: withoutOldCustom };
+        });
+    };
+
+    const handleCustomReminderBlur = () => {
+        const newCustomValue = convertToMinutes(Number(customReminder), customReminderUnit);
+        
+        if (isNaN(newCustomValue) || newCustomValue <= 0) {
+            // Invalid input - remove custom reminder if it exists
+            if (customReminderValue !== null) {
+                setFormData((prev) => ({
+                    ...prev,
+                    reminders: prev.reminders.filter((r) => r !== customReminderValue)
+                }));
+                setCustomReminderValue(null);
+            }
+            return;
+        };
 
         setFormData((prev) => {
             const current = prev.reminders;
-            const oldCustomValue = convertToMinutes(Number(customReminder), customReminderUnit);
-            const withoutOld = current.filter((v) => v !== oldCustomValue);
-
-            const newCustomValue = convertToMinutes(Number(customReminder), newUnit);
-            if (!isNaN(newCustomValue) && newCustomValue > 0) {
-            return { ...prev, reminders: [...withoutOld, newCustomValue] };
-            }
-            return { ...prev, reminders: withoutOld };
+            // Remove the old custom value if it exists
+            const withoutOldCustom = customReminderValue !== null
+                ? current.filter((r) => r !== customReminderValue)
+                : current;
+            
+            // Add the new custom value if it's not already there
+            const updatedReminders = withoutOldCustom.includes(newCustomValue)
+                ? withoutOldCustom
+                : [...withoutOldCustom, newCustomValue];
+            
+            return { ...prev, reminders: updatedReminders };
         });
-    }
+        
+        // Update the tracked custom value
+        setCustomReminderValue(newCustomValue);
+    };
 
     const convertToMinutes = (val, unit) => {
         switch (unit) {
@@ -514,7 +554,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                                     const val = convertToMinutes(Number(customReminder), customReminderUnit);
                                                     if(!isNaN(val) && val > 0) toggleReminder(val);
                                                 }}/>
-                                                <input className={` ${s.customRemindInput} ${formData.reminders.includes(convertToMinutes(Number(customReminder), customReminderUnit)) ? "" : s.reminderInputDisabled}`} value={customReminder} onChange={handleCustomReminderChange} placeholder="#" inputMode="numeric"/>
+                                                <input className={` ${s.customRemindInput} ${formData.reminders.includes(convertToMinutes(Number(customReminder), customReminderUnit)) ? "" : s.reminderInputDisabled}`} value={customReminder} onChange={handleCustomReminderChange} onBlur={handleCustomReminderBlur} placeholder="#" inputMode="numeric"/>
                                                 <select className={`${formData.reminders.includes(convertToMinutes(Number(customReminder), customReminderUnit)) ? "" : s.reminderInputDisabled}`} value={customReminderUnit} onChange={handleCustomReminderUnitChange}>
                                                     <option value="minutes" >minutes</option> {/*add selected={} */}
                                                     <option value="hours" >hours</option>
