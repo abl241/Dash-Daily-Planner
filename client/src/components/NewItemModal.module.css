@@ -16,13 +16,8 @@
     width: 75rem;
     max-width: 90vw;
     min-height: 80vh;
-    /* Limit modal height to viewport */
     max-height: 80vh;
-
-    /* Allow internal scrolling */
     overflow-y: auto;
-
-    /* Optional: smooth inner scroll */
     scroll-behavior: smooth;
 }
 
@@ -85,7 +80,6 @@ select:focus {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-
 }
 
 .toggleGroup {
@@ -138,6 +132,29 @@ select:focus {
 .labelInputPair {
     display: flex;
     flex-direction: column;
+}
+
+.notesInput {
+    background-color: var(--secondary-color);
+    border: none;
+    border-radius: .5rem;
+    padding-left: .5rem;
+    padding-right: .5rem;
+    font: inherit;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text-color);
+    resize: none;
+    line-height: 1.5;
+    min-height: 4rem;
+    max-height: 10rem;
+    overflow-y: auto;
+}
+.notesInput:focus {
+    outline: none;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);;
+    transform: scale(1.025);
 }
 
 /* Start / End time */

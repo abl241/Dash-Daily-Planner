@@ -6,6 +6,7 @@ import DropdownChecklist from "./DropdownChecklist";
 
 export default function NewItemModal({ isOpen, onClose, onAdd }) {
     const [type, setType] = useState("task"); // "task" or "event"
+    const [rows, setRows] = useState(2);
     const [repeat, setRepeat] = useState(false);
     const [reminder, setReminder] = useState(false);
     const [endRepeatNever, setEndRepeatNever] = useState(true);
@@ -67,6 +68,15 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         return () => document.removeEventListener("keydown", handleEsc);
     }, [onClose]);
 
+    // Auto-expand notes textarea
+    useEffect(() => {
+        const rowlen = formData.notes.split("\n");
+        if (rowlen.length >= 2) {
+        setRows(rowlen.length);
+        }
+    }, [formData.notes]);
+
+    // Generic handler for input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => {
@@ -392,7 +402,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
 
                     <div className={s.labelInputPair}>
                         <label>Notes</label>
-                        <input name="notes" value={formData.notes} onChange={handleChange}/> {/* notes */}
+                        <textarea className={s.notesInput} name="notes" value={formData.notes} rows={rows} onChange={handleChange}/> {/* notes */}
                     </div>
                     <div className={s.labelInputPair}>
                         <label>Link</label>
