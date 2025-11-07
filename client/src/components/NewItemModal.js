@@ -270,23 +270,23 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
     };
 
     const handleCustomReminderChange = (e) => {
-        const newVal = e.target.value;
-            setCustomReminder(newVal);
+        const newVal = e.target.value.replace(/\D/g, "");
+        setCustomReminder(newVal);
+        
+        // Don't update formData here, only update tempDate for visual feedback
+        setTempDate((prev) => {
+            const current = prev.reminders;
+            // Remove the old custom value if it exists
+            const withoutOldCustom = customReminderValue !== null 
+                ? current.filter((v) => v !== customReminderValue)
+                : current;
             
-            // Don't update formData here, only update tempDate for visual feedback
-            setTempDate((prev) => {
-                const current = prev.reminders;
-                // Remove the old custom value if it exists
-                const withoutOldCustom = customReminderValue !== null 
-                    ? current.filter((v) => v !== customReminderValue)
-                    : current;
-                
-                const newCustomValue = convertToMinutes(Number(newVal), customReminderUnit);
-                if (!isNaN(newCustomValue) && newCustomValue > 0) {
-                    return { ...prev, reminders: [...withoutOldCustom, newCustomValue] };
-                }
-                return { ...prev, reminders: withoutOldCustom };
-            });
+            const newCustomValue = convertToMinutes(Number(newVal), customReminderUnit);
+            if (!isNaN(newCustomValue) && newCustomValue > 0) {
+                return { ...prev, reminders: [...withoutOldCustom, newCustomValue] };
+            }
+            return { ...prev, reminders: withoutOldCustom };
+        });
     };
 
     const handleCustomReminderUnitChange = (e) => {
