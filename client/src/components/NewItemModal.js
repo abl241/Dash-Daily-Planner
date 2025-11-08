@@ -22,6 +22,17 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         month: String(today.getMonth() + 1).padStart(2, "0"),
         year: String(today.getFullYear()),
     };
+    const getTomorrow = () => {
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return {
+            day: String(tomorrow.getDate()).padStart(2, "0"),
+            month: String(tomorrow.getMonth() + 1).padStart(2, "0"),
+            year: String(tomorrow.getFullYear()),
+        };
+    };
+    const tomorrowDate = getTomorrow();
+
     const [formData, setFormData] = useState({
         title: "",
         notes: "",
@@ -31,11 +42,11 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         repeatRules: {unit: "", interval: "", selectedDays: [], endRules: {type: "never", count: null, month: defaultDate.month, day: defaultDate.day, year: defaultDate.year}},
         link: "",
         //task specific
-        dueDate: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "AM"},
+        dueDate: {month: tomorrowDate.month, day: tomorrowDate.day, year: tomorrowDate.year, hour: "12", minute: "00", period: "AM"},
         completeStatus: false,
         //event specific
-        startTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "AM"},
-        endTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "AM"},
+        startTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
+        endTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
     });
     const modalRef = useRef(null);
     const savedForm = useRef(formData);
@@ -357,6 +368,19 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
 
     const handleSubmit = (e) => { // ensure end date is after start date; no required fields are left blank; check if reminder/repeat is on or give "" values; only values for selected endrepeat rules are given
         e.preventDefault();
+
+        // required fields
+
+        // validate start/end date
+
+        // build submission data
+
+        // handle reminders
+
+        // handle repeat
+
+
+
         onAdd(formData);
         setFormData({
             title: "",
