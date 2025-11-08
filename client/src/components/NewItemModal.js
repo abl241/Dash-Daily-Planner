@@ -363,21 +363,97 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                 return val * 60 * 24;
             default:
                 return val;
-        }
+        };
+    };
+
+    // Handle every x days/weeks/months/year input change
+    const handleRepeatEveryChange = (e) => {
+        const newVal = e.target.value.replace(/\D/g, "");
+        
+        // Don't update formData here, only update tempDate for visual feedback
+        setTempDate((prev) => {
+            const current = prev.repeatRules || {};
+            return { ...prev, repeatRules: {
+                ...current, interval: newVal === "" ? "" : Number(newVal)
+            }};
+        });
+    };
+    const handleRepeatEveryBlur = () => {
+        setFormData((prev) => {
+            const interval = Number(tempDate.repeatRules?.interval);
+            const currentRules = prev.repeatRules || {};
+
+            if (isNaN(interval) || interval <= 0) {
+            // reset invalid interval
+            return {
+                ...prev,
+                repeatRules: { ...currentRules, interval: 1 } // default to 1
+            };
+            }
+
+            // commit valid interval to formData
+            return {
+            ...prev,
+            repeatRules: { ...currentRules, interval }
+            };
+        });
     };
 
     const handleSubmit = (e) => { // ensure end date is after start date; no required fields are left blank; check if reminder/repeat is on or give "" values; only values for selected endrepeat rules are given
         e.preventDefault();
 
         // required fields
+        if(!formData.title.trim()) {
+            alert("Title is required.");
+            return;
+        }
+        if(type === "task") {
+            const { day, month, year } = formData.dueDate;
+            if(!day || !month || !year) {
+                alert("Please provide a valid due date for the task.");
+                return;
+            }
+        }
+        if(type === "event") {
+            const { day: startDay, month: startMonth, year: startYear } = formData.startTime;
+            if(!startDay || !startMonth || !startYear) {
+                alert("Please provide a valid start date for the event.");
+                return;
+            }
+            const { day: endDay, month: endMonth, year: endYear } = formData.endTime;
+            if(!endDay || !endMonth || !endYear) {
+                alert("Please provide a valid end date for the event.");
+                return;
+            }
+        }
 
         // validate start/end date
+        if(type === "event") {
+            const start = new Date(`${formData.startTime.year}-${formData.startTime.month}-${formData.startTime.day} ${formData.startTime.hour}:${formData.startTime.minute} ${formData.startTime.period}`);
+            const end = new Date(`${formData.endTime.year}-${formData.endTime.month}-${formData.endTime.day} ${formData.endTime.hour}:${formData.endTime.minute} ${formData.endTime.period}`);
+            if(end <= start) {
+                alert("End time must be after start time.");
+                return;
+            }
+        }
 
         // build submission data
+        const submissionData = { ...formData };
 
         // handle reminders
+        if(!reminder) {
+            delete submissionData.reminders;
+        }
 
         // handle repeat
+        if(!repeat) {
+            delete submissionData.repeat;
+        } else {
+            if(endRepeatAfter && !submissionData.repeatRules.endRules.count) {
+                alert("Please provide a valid number of occurrences for 'End After' repeat rule.");
+            }
+
+        }
 
 
 
@@ -508,7 +584,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                         <div>
                                             <div className={s.intervalRules}>
                                                 <label>Every</label>
-                                                <input className={s.repeatInterval} name="repeatRules.interval" value={formData.repeatRules.interval} onChange={handleChange} placeholder="#"/> {/* need to make input checks, onblur thing */}
+                                                <input className={s.repeatInterval} name="repeatRules.interval" value={tempDate.repeatRules.interval} onChange={handleRepeatEveryChange} onBlur={handleRepeatEveryBlur} placeholder="#"/> {/* need to make input checks, onblur thing */}
                                                 <select className={s.repeatUnit} name="repeatRules.unit" value={formData.repeatRules.unit} onChange={handleChange}> {/* repeat unit */}
                                                     <option value="day(s)">day(s)</option> {/* make pluralization logic later */}
                                                     <option value="week(s)">week(s)</option>
