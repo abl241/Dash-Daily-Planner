@@ -451,10 +451,10 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         } else {
             if(endRepeatAfter && !submissionData.repeatRules.endRules.count) {
                 alert("Please provide a valid number of occurrences for 'End After' repeat rule.");
+            } else if(endRepeatOn && (!submissionData.repeatRules.endRules.day || !submissionData.repeatRules.endRules.month || !submissionData.repeatRules.endRules.year)) {
+                alert("Please provide a valid end date for 'End On' repeat rule.");
             }
-
         }
-
 
 
         onAdd(formData);
@@ -471,7 +471,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             startTime: "",
             endTime: "",
         });
-        savedForm.current = formData;
+        savedForm.current = submissionData;
         onClose();
     };
 
