@@ -38,8 +38,8 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         notes: "",
         category: "",
         reminders: [],
-        repeat: "",
-        repeatRules: {unit: "", interval: "", selectedDays: [], endRules: {type: "never", count: null, month: defaultDate.month, day: defaultDate.day, year: defaultDate.year}},
+        repeat: false,
+        repeatRules: {unit: "days", interval: "", selectedDays: [], endRules: {type: "never", count: "", month: defaultDate.month, day: defaultDate.day, year: defaultDate.year}},
         link: "",
         //task specific
         dueDate: {month: tomorrowDate.month, day: tomorrowDate.day, year: tomorrowDate.year, hour: "12", minute: "00", period: "AM"},
@@ -105,6 +105,14 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             return updated;
         });
     };
+
+    // Handler for toggling repeat
+    const handleToggleRepeat = () => {
+        setRepeat(!repeat);
+        setFormData((prev) => ({
+            ...prev, repeat: !repeat,
+        }));
+     };
 
     // Logic and handlers for time or date change
     const [tempDate, setTempDate] = useState(formData);
@@ -175,7 +183,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             setFormData(newTemp);
             return newTemp;
         });
-    }
+    };
 
     const handleTimeChange = (field, part, min, max) => (e) => {
         const val = e.target.value.replace(/\D/g, "");
@@ -207,7 +215,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             ...prev,
             [field]: { ...prev[field], period: value },
         }));
-    }
+    };
 
     // Handle end repeat option toggles
     const handleEndRuleToggle = (type) => {
@@ -449,15 +457,25 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         if(!repeat) {
             delete submissionData.repeat;
         } else {
+            if(submissionData.repeatRules.interval <= 0) {
+                alert("Please provide a valid repeat interval.");
+                return;
+            }
+            if(submissionData.repeatRules.unit === "weeks" && submissionData.repeatRules.selectedDays.length === 0) {
+                alert("Please select at least one day of the week for weekly repeats.");
+                return;
+            }
             if(endRepeatAfter && !submissionData.repeatRules.endRules.count) {
                 alert("Please provide a valid number of occurrences for 'End After' repeat rule.");
+                return;
             } else if(endRepeatOn && (!submissionData.repeatRules.endRules.day || !submissionData.repeatRules.endRules.month || !submissionData.repeatRules.endRules.year)) {
                 alert("Please provide a valid end date for 'End On' repeat rule.");
+                return;
             }
         }
 
 
-        onAdd(formData);
+        //onAdd(formData); // maybe need to include type as well (event/task)
         setFormData({
             title: "",
             notes: "",
@@ -472,6 +490,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             endTime: "",
         });
         savedForm.current = submissionData;
+        console.log("Submitted data:", submissionData);
         onClose();
     };
 
@@ -577,7 +596,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                     )}
                     <div className={s.repeatAndReminders}>
                         <div className={s.labelInputPair}> {/* repeat */}
-                            <Button className={s.repeatAndReminderButton} onClick={() => setRepeat(!repeat)} variant="toggle" toggled={repeat}>Repeat?</Button>
+                            <Button className={s.repeatAndReminderButton} onClick={handleToggleRepeat} variant="toggle" toggled={repeat}>Repeat?</Button>
                             {repeat && (
                                 <>
                                     <div className={s.repeatAndReminderContainer}>
@@ -586,21 +605,21 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                                                 <label>Every</label>
                                                 <input className={s.repeatInterval} name="repeatRules.interval" value={tempDate.repeatRules.interval} onChange={handleRepeatEveryChange} onBlur={handleRepeatEveryBlur} placeholder="#"/> {/* need to make input checks, onblur thing */}
                                                 <select className={s.repeatUnit} name="repeatRules.unit" value={formData.repeatRules.unit} onChange={handleChange}> {/* repeat unit */}
-                                                    <option value="day(s)">day(s)</option> {/* make pluralization logic later */}
-                                                    <option value="week(s)">week(s)</option>
-                                                    <option value="month(s)">month(s)</option>
-                                                    <option value="year(s)">year(s)</option>
+                                                    <option value="days">day(s)</option> {/* make pluralization logic later */}
+                                                    <option value="weeks">week(s)</option>
+                                                    <option value="months">month(s)</option>
+                                                    <option value="years">year(s)</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                {formData.repeatRules.unit === "week(s)" && (
+                                                {formData.repeatRules.unit === "weeks" && (
                                                     <>
                                                         <div className={s.repeatDays}>
                                                             <label>On</label>
                                                             <DropdownChecklist
                                                                 options={["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]}
                                                                 selectedOptions={formData.repeatRules.selectedDays}
-                                                                onChange={(days) => setFormData(prev => ({...prev, repeatDays: days}))}
+                                                                onChange={(days) => setFormData(prev => ({...prev, repeatRules: {...prev.repeatRules, selectedDays:days}}))}
                                                             />
                                                         </div>
                                                     </>
@@ -678,7 +697,8 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                             )}
                         </div>
                     </div>
-                            <Button onClick={()=> console.log(tempDate)}>Log formData</Button>
+                            <Button onClick={() => console.log(formData)}>log formData</Button>
+                            <Button onClick={handleSubmit}>Submit</Button>
                 </form>
             </div>
         </div>
