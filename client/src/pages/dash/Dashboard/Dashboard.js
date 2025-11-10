@@ -22,7 +22,7 @@ export default function Dashboard() {
     };
 
     // modal stuff
-    const handleAdd = async (data, type) => {
+    const handleAdd = async (data, type) => { // add handler for reminders (add to separate reminders table)
         try {
             if(type === "task") {
                 const newTask = await fetch("http://localhost:4000/tasks", {

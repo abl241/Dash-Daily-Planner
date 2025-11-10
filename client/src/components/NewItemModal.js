@@ -154,7 +154,6 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             day: pad(d),
         };
     };
-
     const handleTempChange = (field, part) => (e) => {
         const val = e.target.value.replace(/\D/g, "");
         if (val === "" || val.length <= (part === "year" ? 4 : 2)) {
@@ -164,13 +163,13 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             }));
         }
     };
-
+    
     const handlePadBlur = (field, part) => () => {
         setTempDate((prev) => {
             const current = prev[field] || {};
             const prevPart = current[part] ?? "";
             let updated = { ...current };
-
+            
             if (prevPart !== "") {
                 updated[part] = part === "year" ? padYear(prevPart) : pad(prevPart);
             }
@@ -178,9 +177,13 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             if (day && month && year) {
                 updated = normalizeDate(updated);
             }
-
+            
             const newTemp = { ...prev, [field]: updated };
-            setFormData(newTemp);
+            setFormData((prevForm) => ({
+                ...prevForm, [field]: {
+                    ...prevForm[field], ...updated
+                }
+            }));
             return newTemp;
         });
     };
@@ -204,7 +207,11 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             if (prevPart !== "") updated[part] = pad(prevPart);
 
             const newTemp = { ...prev, [field]: updated };
-            setFormData(newTemp);
+            setFormData((prevForm) => ({
+                ...prevForm, [field]: {
+                    ...prevForm[field], ...updated
+                }
+            }));
             return newTemp;
         });
     };
@@ -215,6 +222,10 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             ...prev,
             [field]: { ...prev[field], period: value },
         }));
+        setFormData((prev) => ({
+        ...prev,
+        [field]: { ...prev[field], period: value },
+    }));
     };
 
     // Handle end repeat option toggles
@@ -222,7 +233,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         setFormData((prev) => ({
             ...prev, repeatRules: {
                 ...prev.repeatRules, endRules: {
-                    type: type
+                    ...prev.repeatRules.endRules, type: type
                 }
             }
         }));
@@ -262,7 +273,13 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             const newTemp = { ...prev, repeatRules: {
                 ...prev.repeatRules, endRules: updated
             }};
-            setFormData(newTemp);
+            setFormData((prevForm) => ({
+                ...prevForm,
+                repeatRules: {
+                    ...prevForm.repeatRules,
+                    endRules: updated
+                }
+            }));
             return newTemp;
         });
     };
@@ -416,8 +433,8 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             return;
         }
         if(type === "task") {
-            const { day, month, year } = formData.dueDate;
-            if(!day || !month || !year) {
+            const { day, month, year, hour, minute } = formData.dueDate;
+            if(!day || !month || !year || !hour || !minute) {
                 alert("Please provide a valid due date for the task.");
                 return;
             }
@@ -475,19 +492,21 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         }
 
 
-        onAdd(formData, type); // maybe need to include type as well (event/task)
+        onAdd(formData, type); // fix bug for adding new item after submitting
         setFormData({
             title: "",
             notes: "",
-            date: "",
             category: "",
-            reminders: "",
-            repeat: "",
-            repeatRules: "",
-            completeStatus: false,
+            reminders: [],
+            repeat: false,
+            repeatRules: {unit: "days", interval: "", selectedDays: [], endRules: {type: "never", count: "", month: defaultDate.month, day: defaultDate.day, year: defaultDate.year}},
             link: "",
-            startTime: "",
-            endTime: "",
+            //task specific
+            dueDate: {month: tomorrowDate.month, day: tomorrowDate.day, year: tomorrowDate.year, hour: "12", minute: "00", period: "AM"},
+            completeStatus: false,
+            //event specific
+            startTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
+            endTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
         });
         savedForm.current = submissionData;
         console.log("Submitted data:", submissionData);
