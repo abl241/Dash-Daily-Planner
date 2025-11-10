@@ -5,7 +5,6 @@ const router = express.Router();
 
 
 function mapTaskData(formData, userId) {
-    console.log(formData);
     const {
         title,
         notes,
@@ -41,7 +40,7 @@ function formatDateTime({ year, month, day, hour, minute, period }) {
     const minutePadded = minute.toString().padStart(2, "0");
 
     return `${year}-${monthPadded}-${dayPadded} ${hourPadded}:${minutePadded}:00`;
-}
+};
 
 // ********************************************************** Create a new task **********************************************************
 router.post('/', async (req, res) => {

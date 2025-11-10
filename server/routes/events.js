@@ -30,30 +30,31 @@ function mapEventData(formData, userId) {
         updated_at: new Date(),
     };
 };
+function formatDateTime({ year, month, day, hour, minute, period }) {
+    let h = parseInt(hour, 10);
+    if (period === "PM" && h < 12) h += 12;
+    if (period === "AM" && h === 12) h = 0;
+
+    const monthPadded = month.toString().padStart(2, "0");
+    const dayPadded = day.toString().padStart(2, "0");
+    const hourPadded = h.toString().padStart(2, "0");
+    const minutePadded = minute.toString().padStart(2, "0");
+
+    return `${year}-${monthPadded}-${dayPadded} ${hourPadded}:${minutePadded}:00`;
+};
 
 // ********************************************************** Create a new event **********************************************************
 
 router.post('/', async (req, res) => {
     try {
         const userId = req.user.id;
-        const {
-            name,
-            start_time,
-            end_time,
-            category,
-            notes,
-            is_recurring,
-            repeat_rule,
-        } = req.body;
-        if(!name || !start_time || !end_time) {
-            return res.status(400).json({ message: "Please provide name, start_time and end_time" });
-        }
+        const data = mapEventData(req.body, userId);
 
         const newEvent = await pool.query("INSERT INTO events (user_id, name, start_time, end_time, category, notes, is_recurring, repeat_rule) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
-            [ userId, name, start_time, end_time, category, notes, is_recurring, repeat_rule ]
+            [ userId, data.name, data.start_time, data.end_time, data.category, data.notes, data.is_recurring, data.repeat_rule ]
         );
 
-        res.status(201).json(newEvent.rows[0]);
+        res.status(201).json(newEvent.rows[0]); 
     } catch (err) {
         console.error("Error creating event: ", err.message);
         res.status(500).json({ message: "Server error creating event" });
