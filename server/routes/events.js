@@ -3,6 +3,34 @@ const pool = require('../db');
 
 const router = express.Router();
 
+function mapEventData(formData, userId) {
+    const {
+        title,
+        notes,
+        category,
+        link,
+        repeat,
+        repeatRules,
+        startTime,
+        endTime,
+    } = formData;
+    const start_time = formatDateTime(startTime);
+    const end_time = formatDateTime(endTime);
+    return {
+        user_id: userId,
+        name: title,
+        notes,
+        category,
+        link,
+        is_recurring: repeat,
+        repeat_rule: repeat ? JSON.stringify(repeatRules) : null,
+        start_time,
+        end_time,
+        created_at: new Date(),
+        updated_at: new Date(),
+    };
+};
+
 // ********************************************************** Create a new event **********************************************************
 
 router.post('/', async (req, res) => {

@@ -475,7 +475,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         }
 
 
-        //onAdd(formData); // maybe need to include type as well (event/task)
+        onAdd(formData, type); // maybe need to include type as well (event/task)
         setFormData({
             title: "",
             notes: "",
