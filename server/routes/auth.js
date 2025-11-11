@@ -66,7 +66,16 @@ router.post("/login", async (req, res) => {
             return res.status(400).json({ message: "Invalid credentials" });
         }
 
-        const token = generateAccessToken(user.rows[0]);
+        const accessToken = generateAccessToken(user.rows[0]);
+        const refreshToken = jwt.sign(
+            { id: user.rows[0].id },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: '7d' } // Refresh token valid for 7 days
+        );
+
+        await pool.query("INSERT INTO refresh_tokens (token, user_id) VALUES ($1, $2)",
+            [ refreshToken, user.rows[0].id ]
+        );
 
         res.json({
             message: "Login successful",
@@ -76,7 +85,7 @@ router.post("/login", async (req, res) => {
                 last_name: user.rows[0].last_name,
                 email: user.rows[0].email,
             },
-            token
+            accessToken,
             });
     } catch (err) {
         console.error(err.message);
@@ -97,6 +106,62 @@ router.get("/profile", authenticateToken, async (req, res) => {
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ message: "Server error fetching profile" });
+    }
+});
+
+// ********************************************************** Refresh user session **********************************************************
+router.post("/refresh", async (req, res) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
+        if(!refreshToken) {
+            return res.status(401).json({ message: "No refresh token provided" });
+        }
+
+        const tokenResult = await pool.query("SELECT * FROM refresh_tokens WHERE token = $1",
+            [ refreshToken ]
+        );
+        if(tokenResult.rows.length === 0) {
+            return res.status(403).json({ message: "Invalid refresh token" });
+        }
+
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+            if(err) {
+                console.log("Refresh token verification error: ", err.message);
+                return res.status(403).json({ message: "Invalid or expired refresh token" });
+            }
+
+            const newAccessToken = generateAccessToken({ id: decoded.id });
+            res.json({ accessToken: newAccessToken });
+        })
+    } catch (err) {
+        console.error("Error refreshing token: ", err.message);
+        res.status(500).json({ message: "Server error refreshing token" });
+    }
+});
+
+// ********************************************************** User logout **********************************************************
+router.post("/logout", async (req, res) => {
+    try {
+
+        const refreshToken = req.cookies.refreshToken;
+        if(!refreshToken) {
+            return res.status(400).json({ message: "No refresh token provided" });
+        }
+
+        await pool.query("DELETE FROM refresh_tokens WHERE token = $1",
+            [ refreshToken ]
+        );
+
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Strict'
+        });
+
+        res.json({ message: "Logout successful" });
+    } catch (err) {
+        console.error("Error during logout: ", err.message);
+        res.status(500).json({ message: "Server error during logout" });
     }
 });
 

@@ -1,4 +1,5 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const pool = require('./db');
 const authenticateToken = require('./middleware/auth');
@@ -6,8 +7,12 @@ const authenticateToken = require('./middleware/auth');
 
 // Middleware
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}));
 app.use(express.json());
+app.use(cookieParser());
 
 
 // Routes
