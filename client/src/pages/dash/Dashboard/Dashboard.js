@@ -5,6 +5,8 @@ import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 
+import api from '../../../api/axios';
+
 import NewItemModal from "../../../components/NewItemModal";
 import Button from "../../../components/Button";
 
@@ -25,27 +27,11 @@ export default function Dashboard() {
     const handleAdd = async (data, type) => { // add handler for reminders (add to separate reminders table)
         try {
             if(type === "task") {
-                const newTask = await fetch("http://localhost:4000/tasks", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                    body: JSON.stringify(data),
-                });
-                const taskResult = await newTask.json();
-                console.log("New task added:", taskResult);
+                const newTask = await api.post("/tasks", data);
+                console.log("New task added:", newTask.data);
             } else if(type === "event") {
-                const newEvent = await fetch("http://localhost:4000/events", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                    body: JSON.stringify(data),
-                });
-                const eventResult = await newEvent.json();
-                console.log("New event added:", eventResult);
+                const newEvent = await api.post("/events", data);
+                console.log("New event added:", newEvent.data);
             }
         } catch (err) {
             console.error("Error adding new item:", err);

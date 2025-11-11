@@ -14,7 +14,6 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-
 // Routes
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);

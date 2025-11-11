@@ -1,12 +1,12 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "http://localhost:5000",
+    baseURL: "http://localhost:4000",
     withCredentials: true,
 });
 
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("token");
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -56,14 +56,14 @@ api.interceptors.response.use(
                 { withCredentials: true }
             );
             
-            const newToken = res.data.accessToken;
-            localStorage.setItem("accessToken", newToken);
+            const newToken = res.data.token;
+            localStorage.setItem("token", newToken);
             api.defaults.headers.common.Authorization = `Bearer ${newToken}`;
             processQueue(null, newToken);
             return await api(originalRequest);
         } catch(err) {
             processQueue(err, null);
-            localStorage.removeItem("accessToken");
+            localStorage.removeItem("token");
             window.location.href = "/auth/login";
             return Promise.reject(err);
         } finally {

@@ -2,6 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+import api from "../../../api/axios.js"
+
 import Button from "../../../components/Button.js"
 import s from "./AuthForm.module.css";
 
@@ -19,7 +21,7 @@ export default function AuthForm({ type }) {
     e.preventDefault();
     try {
         const endpoint = isLogin ? "/auth/login" : "/auth/register";
-        const res = await axios.post(endpoint, { email, password, first_name, last_name });
+        const res = await api.post(endpoint, { email, password, first_name, last_name });
 
         if(isLogin) {
             const { token, user } = res.data;

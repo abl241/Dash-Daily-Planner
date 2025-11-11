@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const pool = require('../db');
 const { generateAccessToken } = require('../utils/authTokens');
@@ -66,15 +67,17 @@ router.post("/login", async (req, res) => {
             return res.status(400).json({ message: "Invalid credentials" });
         }
 
-        const accessToken = generateAccessToken(user.rows[0]);
+        const token = generateAccessToken(user.rows[0]);
         const refreshToken = jwt.sign(
             { id: user.rows[0].id },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '7d' } // Refresh token valid for 7 days
         );
 
-        await pool.query("INSERT INTO refresh_tokens (token, user_id) VALUES ($1, $2)",
-            [ refreshToken, user.rows[0].id ]
+        const hashedToken = crypto.createHash("sha256").update(refreshToken).digest("hex");
+
+        await pool.query("INSERT INTO refresh_tokens (user_id, token_hash, user_agent, ip_address, created_at, expires_at, revoked) VALUES ($1, $2, $3, $4, NOW(), $5, false)",
+            [ user.rows[0].id, hashedToken, req.headers["user-agent"] || null, req.ip || null, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)]
         );
 
         res.json({
@@ -85,7 +88,7 @@ router.post("/login", async (req, res) => {
                 last_name: user.rows[0].last_name,
                 email: user.rows[0].email,
             },
-            accessToken,
+            token,
             });
     } catch (err) {
         console.error(err.message);
@@ -117,8 +120,10 @@ router.post("/refresh", async (req, res) => {
             return res.status(401).json({ message: "No refresh token provided" });
         }
 
-        const tokenResult = await pool.query("SELECT * FROM refresh_tokens WHERE token = $1",
-            [ refreshToken ]
+        const hashedToken = crypto.createHash("sha256").update(refreshToken).digest("hex");
+
+        const tokenResult = await pool.query("SELECT * FROM refresh_tokens WHERE token_hash = $1 AND revoked = false AND expires_at > NOW()",
+            [ hashedToken ]
         );
         if(tokenResult.rows.length === 0) {
             return res.status(403).json({ message: "Invalid refresh token" });
