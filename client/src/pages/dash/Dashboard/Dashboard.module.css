@@ -28,7 +28,7 @@
 }
 
 /* Overview area: weekly, today’s events, due today */
-.overviewSection {
+.upcomingWeekSection {
   display: flex;
   flex-direction: column;
   gap: 20px;

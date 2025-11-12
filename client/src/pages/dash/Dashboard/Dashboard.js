@@ -7,6 +7,7 @@ import "react-resizable/css/styles.css";
 
 import api from '../../../api/axios';
 
+import UpcomingWeek from "../../components/upcomingWeek";
 import NewItemModal from "../../../components/NewItemModal";
 import Button from "../../../components/Button";
 
@@ -42,8 +43,9 @@ export default function Dashboard() {
     return (
         <div className={s.dashboardContainer}>
             <section className={s.mainSection}>
-                <div className={s.overviewSection}>
+                <div className={s.upcomingWeekSection}>
                     {/* insert overview components here */}
+                    <UpcomingWeek/>
                     <Button variant="primary" onClick={() => setIsModalOpen(true)}>Add New</Button>
                     <NewItemModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={handleAdd}/>
                 </div>
