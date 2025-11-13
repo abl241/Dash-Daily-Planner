@@ -1,5 +1,6 @@
 import s from "./Day.module.css"
 import React, { useState } from "react";
+import { addDays, startOfToday, isSameDay, format } from "date-fns";
 
 export default function Day({date, data, variant="upcomingWeek"}) {
     /*
@@ -41,8 +42,8 @@ export default function Day({date, data, variant="upcomingWeek"}) {
         case "upcomingWeek":
             return (
                 <div className={s.uwCard}>
-                    <h1>day of week</h1>
-                    <h2>date</h2>
+                    <h1>{format(date, "EEE")}</h1>
+                    <h2>{format(date, "MM/dd")}</h2>
                     <div className={s.uwTasks}>
 
                     </div>

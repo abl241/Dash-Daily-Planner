@@ -5,22 +5,6 @@ import Button from "./Button"
 import DropdownChecklist from "./DropdownChecklist";
 
 export default function NewItemModal({ isOpen, onClose, onAdd }) {
-    const [formData, setFormData] = useState({
-        title: "",
-        notes: "",
-        category: "",
-        reminders: [],
-        repeat: false,
-        repeatRules: {unit: "days", interval: "", selectedDays: [], endRules: {type: "never", count: "", month: defaultDate.month, day: defaultDate.day, year: defaultDate.year}},
-        link: "",
-        //task specific
-        dueDate: {month: tomorrowDate.month, day: tomorrowDate.day, year: tomorrowDate.year, hour: "12", minute: "00", period: "AM"},
-        completeStatus: false,
-        //event specific
-        startTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
-        endTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
-    });
-    
     const [type, setType] = useState("task"); // "task" or "event"
     const [rows, setRows] = useState(2);
     const [repeat, setRepeat] = useState(false);
@@ -31,7 +15,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
     const [customReminder, setCustomReminder] = useState("");
     const [customReminderUnit, setCustomReminderUnit] = useState("minutes");
     const [customReminderValue, setCustomReminderValue] = useState(null);
-
+    
     const today = new Date();
     const defaultDate = {
         day: String(today.getDate()).padStart(2, "0"),
@@ -48,7 +32,22 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         };
     };
     const tomorrowDate = getTomorrow();
-
+    
+    const [formData, setFormData] = useState({
+        title: "",
+        notes: "",
+        category: "",
+        reminders: [],
+        repeat: false,
+        repeatRules: {unit: "days", interval: "", selectedDays: [], endRules: {type: "never", count: "", month: defaultDate.month, day: defaultDate.day, year: defaultDate.year}},
+        link: "",
+        //task specific
+        dueDate: {month: tomorrowDate.month, day: tomorrowDate.day, year: tomorrowDate.year, hour: "12", minute: "00", period: "AM"},
+        completeStatus: false,
+        //event specific
+        startTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
+        endTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
+    });
     const modalRef = useRef(null);
     const savedForm = useRef(formData);
 

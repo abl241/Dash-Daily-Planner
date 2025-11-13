@@ -19,7 +19,7 @@ const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
 
 // Protected routes
-const tasksRoutes = require('./routes/tasks');
+const tasksRoutes = require('./routes/tasks'); // holds tasks & events combined routes too
 app.use('/tasks', authenticateToken, tasksRoutes);
 
 const eventRoutes = require('./routes/events');
@@ -30,6 +30,9 @@ app.use('/reminders', authenticateToken, remindersRoutes);
 
 const widgetsRoutes = require('./routes/widgets');
 app.use('/widgets', authenticateToken, widgetsRoutes);
+
+const apiRoutes = require('./routes/api');
+app.use('/api', authenticateToken, apiRoutes);
 
 app.listen(4000, () => {
     console.log('Server is running on port 4000');
