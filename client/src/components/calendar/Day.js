@@ -2,7 +2,7 @@ import s from "./Day.module.css"
 import React, { useState } from "react";
 import { addDays, startOfToday, isSameDay, format } from "date-fns";
 
-export default function Day({date, data, variant="upcomingWeek"}) {
+export default function Day({date, data, variant="upcomingWeek", isFocused, onClick}) {
     /*
         data {
             "events" : [
@@ -41,7 +41,7 @@ export default function Day({date, data, variant="upcomingWeek"}) {
     switch (variant) {
         case "upcomingWeek":
             return (
-                <div className={s.uwCard}>
+                <div className={`${s.uwCard} ${isFocused ? s.focused : ""}`} onClick={onClick}>
                     <h1>{format(date, "EEE")}</h1>
                     <h2>{format(date, "MM/dd")}</h2>
                     <div className={s.uwTasks}>

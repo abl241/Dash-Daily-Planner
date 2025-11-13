@@ -18,11 +18,12 @@ export default function UpcomingWeek({}) {
                 const start = format(today, "yyyy-MM-dd");
                 const end = format(addDays(today, 6), "yyyy-MM-dd");
 
-                const data = await axios.get("/api/inrange", {
+                const res = await axios.get("/api/inrange", {
                     params: { start, end }
                 });
 
-                const grouped = groupByDate(data.tasks, data.events, start, end);
+                const { tasks, events } = res.data;
+                const grouped = groupByDate(tasks, events, start, end);
                 setWeekData(grouped);
             } catch (err) {
                 console.error("Error fetching week data: ", err.message);
@@ -66,7 +67,6 @@ export default function UpcomingWeek({}) {
 function groupByDate(tasks, events, startString, endString) {
     const map = {};
 
-    // Pre-fill all 7 days so each key always exists
     const start = new Date(startString);
     for (let i = 0; i < 7; i++) {
         const d = addDays(start, i);
@@ -74,22 +74,23 @@ function groupByDate(tasks, events, startString, endString) {
         map[key] = { date: key, tasks: [], events: [] };
     }
 
-    // ---- GROUP TASKS ----
+    // ---- TASKS ----
     tasks.forEach((task) => {
-        const dateKey = format(task.is_occurrence ? task.occurrence_date : task.due_date, "yyyy-MM-dd");
+        const dateKey = format(
+            new Date(task.is_occurrence ? task.occurrence_date : task.due_date),
+            "yyyy-MM-dd"
+        );
         if (map[dateKey]) {
             map[dateKey].tasks.push(task);
         }
     });
 
-    // ---- GROUP EVENTS ----
+    // ---- EVENTS ----
     events.forEach((event) => {
-        // Each event occurs on its start_time date
         const dateKey = format(
-            event.is_occurrence ? new Date(event.start_time) : new Date(event.start_time),
+            new Date(event.is_occurrence ? event.occurrence_date : event.start_time),
             "yyyy-MM-dd"
         );
-
         if (map[dateKey]) {
             map[dateKey].events.push(event);
         }

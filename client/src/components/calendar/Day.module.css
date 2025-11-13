@@ -1,0 +1,22 @@
+.uwCard {
+    border: .5rem solid var(--border-color);
+    border-radius: .5rem;
+    aspect-ratio: 1/1;
+    flex: 1;
+    display: block;
+}
+
+.uwCard > h1 {
+    margin: .5rem;
+    margin-bottom: 0rem;
+}
+.uwCard > h2 {
+    margin: .5rem;
+    margin-top: 0rem;
+    font-weight: 400;
+}
+
+.uwCard.focused {
+    transform: scale(1.1);
+    border-color: var(--primary-color);
+}
