@@ -7,7 +7,7 @@ import "react-resizable/css/styles.css";
 
 import api from '../../../api/axios';
 
-import UpcomingWeek from "../../components/upcomingWeek";
+import UpcomingWeek from "../../../components/calendar/UpcomingWeek";
 import NewItemModal from "../../../components/NewItemModal";
 import Button from "../../../components/Button";
 
