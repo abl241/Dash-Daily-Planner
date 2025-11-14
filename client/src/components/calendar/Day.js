@@ -69,7 +69,7 @@ export default function Day({date, data, variant="upcomingWeek", isFocused, onCl
                             ) : (
                             tasks.slice(0, visibleCount).map((task, idx) => (
                                 <div key={task.id} className={s.taskItem} ref={idx === 0 ? itemRef : null}>
-                                    <div className={s.categoryDot}/>
+                                    <div className={s.categoryDot}/> {/*Later make color of dot match with category or default to blue*/}
                                     <p className={s.taskName} title={task.name}>{task.name}</p>
                                 </div>
                             ))
