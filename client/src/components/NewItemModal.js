@@ -52,10 +52,19 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
     const savedForm = useRef(formData);
 
     // Detect clicks outside modal, close if so
+    const handleClose = () => {
+        if (document.activeElement) {
+            document.activeElement.blur();
+        }
+        // Give blur handlers time to update formData
+        setTimeout(() => {
+            onClose();
+        }, 0);
+    };
     useEffect(() => {
         const handleClickOutside = (e) =>{
             if(modalRef.current && !modalRef.current.contains(e.target)) {
-                onClose();
+                handleClose();
             }
         };
 
@@ -71,7 +80,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
     // Detects ESC key, closes modal
     useEffect(() => {
         const handleEsc = (e) => {
-            if(e.key === "Escape") onClose();
+            if(e.key === "Escape") handleClose();
         };
         if(isOpen) {
             document.addEventListener("keydown", handleEsc);
@@ -524,7 +533,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                             <Button onClick={() => setType("task")} className={`${s.toggleButton} ${type === "task" ? s.active : ""}`}>Task</Button>
                             <Button onClick={() => setType("event")} className={`${s.toggleButton} ${type === "event" ? s.active : ""}`}>Event</Button>
                         </div>
-                        <Button variant="alert" onClick={onClose} className={s.xButton}>X</Button>
+                        <Button variant="alert" onClick={handleClose} className={s.xButton}>X</Button>
                     </div>
 
                     <div className={s.titleAndCategory}>
