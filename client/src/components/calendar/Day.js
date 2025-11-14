@@ -1,5 +1,5 @@
 import s from "./Day.module.css"
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { addDays, startOfToday, isSameDay, format } from "date-fns";
 
 export default function Day({date, data, variant="upcomingWeek", isFocused, onClick}) {
@@ -37,23 +37,45 @@ export default function Day({date, data, variant="upcomingWeek", isFocused, onCl
     */
     const events = data.events;
     const tasks = data.tasks;
+    const [maxVisible, setMaxVisible] = useState(0);
+    const cardRef = useRef(null);
+    const itemRef = useRef(null);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (!cardRef.current || !itemRef.current) return;
+            const cardHeight = cardRef.current.clientHeight;
+            const itemHeight = itemRef.current.clientHeight;
+            setMaxVisible(Math.floor(cardHeight / itemHeight));
+        };
+
+        handleResize(); // initial calculation
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, [tasks]);
+    const visibleCount = maxVisible > 0 ? maxVisible : 1;
+
 
     switch (variant) {
         case "upcomingWeek":
+
             return (
                 <div className={`${s.uwCard} ${isFocused ? s.focused : ""}`} onClick={onClick}>
                     <h1>{format(date, "EEE")}</h1>
-                    <h2>{format(date, "MM/dd")}</h2>
-                    <div className={s.uwTasks}>
+                    <h2>{`${format(date, "MM/dd")} ${isSameDay(date, startOfToday()) ? "(Today)" : ""}`}</h2>
+                    <div className={s.uwTasks} ref={cardRef}>
                         {tasks.length === 0 ? (
                             <p className={s.empty}>No tasks</p>
                             ) : (
-                            tasks.map((task) => (
-                                <div key={task.id} className={s.taskItem}>
+                            tasks.slice(0, visibleCount).map((task, idx) => (
+                                <div key={task.id} className={s.taskItem} ref={idx === 0 ? itemRef : null}>
                                     <div className={s.categoryDot}/>
                                     <p className={s.taskName} title={task.name}>{task.name}</p>
                                 </div>
                             ))
+                        )}
+                        {tasks.length > visibleCount && (
+                            <div className={s.moreIndicator}>and {tasks.length-visibleCount} more</div>
                         )}
                     </div>
                 </div>

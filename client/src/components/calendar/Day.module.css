@@ -2,7 +2,7 @@
     border: .5rem solid var(--border-color);
     border-radius: .5rem;
     aspect-ratio: 1/1;
-    max-width: 14vw;
+    max-width: 14rem;
     flex: 1;
     display: block;
     background-color: #fff;
@@ -15,6 +15,7 @@
     border-color: var(--primary-color);
     transition: all 0.2s ease;
     z-index: 100;
+    min-width: 14rem;
 }
 
 .uwCard > h1 {
@@ -55,4 +56,13 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.moreIndicator {
+    border-radius: .5rem;
+    background-color: var(--primary-color);
+    color: #fff;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    padding-left: 0.5rem;
 }
