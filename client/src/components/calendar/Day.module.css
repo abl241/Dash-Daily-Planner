@@ -2,21 +2,57 @@
     border: .5rem solid var(--border-color);
     border-radius: .5rem;
     aspect-ratio: 1/1;
+    max-width: 14vw;
     flex: 1;
     display: block;
-}
-
-.uwCard > h1 {
-    margin: .5rem;
-    margin-bottom: 0rem;
-}
-.uwCard > h2 {
-    margin: .5rem;
-    margin-top: 0rem;
-    font-weight: 400;
+    background-color: #fff;
+    transform: scale(1);
+    transition: all 0.2s ease;
 }
 
 .uwCard.focused {
     transform: scale(1.1);
     border-color: var(--primary-color);
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+.uwCard > h1 {
+    color: var(--text-color);
+    margin: .5rem;
+    margin-bottom: 0rem;
+}
+.uwCard > h2 {
+    color: var(--text-color);
+    margin: .5rem;
+    margin-top: 0rem;
+    font-weight: 400;
+}
+
+.empty {
+    color: var(--secondary-text-color);
+    font-size: 2rem;
+    margin-left: 0.5rem;
+}
+
+.taskItem {
+    color: var(--text-color);
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: 0.5rem;
+}
+.categoryDot {
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    min-width: .75rem;
+    width: .75rem;
+    aspect-ratio: 1/1;
+}
+
+.taskName {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

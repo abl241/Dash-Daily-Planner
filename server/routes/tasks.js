@@ -1,7 +1,5 @@
 const express = require('express');
 const pool = require('../db');
-import { RRule, rrulestr } from "rrule";
-
 
 const router = express.Router();
 

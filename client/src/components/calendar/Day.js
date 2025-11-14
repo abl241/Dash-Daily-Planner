@@ -45,7 +45,16 @@ export default function Day({date, data, variant="upcomingWeek", isFocused, onCl
                     <h1>{format(date, "EEE")}</h1>
                     <h2>{format(date, "MM/dd")}</h2>
                     <div className={s.uwTasks}>
-
+                        {tasks.length === 0 ? (
+                            <p className={s.empty}>No tasks</p>
+                            ) : (
+                            tasks.map((task) => (
+                                <div key={task.id} className={s.taskItem}>
+                                    <div className={s.categoryDot}/>
+                                    <p className={s.taskName} title={task.name}>{task.name}</p>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             );

@@ -55,7 +55,7 @@ export default function Dashboard() {
                 </div>
             </section>
 
-            <section className={s.widgetsSection}>
+            {/* <section className={s.widgetsSection}>
                 <h2>Widgets</h2>
                 <GridLayout
                     className="layout"
@@ -67,7 +67,7 @@ export default function Dashboard() {
                 >
 
                 </GridLayout>
-            </section>
+            </section> */}
         </div>
     );
 }

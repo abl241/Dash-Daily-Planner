@@ -1,7 +1,7 @@
 import s from "./UpcomingWeek.module.css";
 import React, { useState, useEffect } from "react";
 import { addDays, startOfToday, isSameDay, format } from "date-fns";
-import axios from "axios";
+import api from "./../../api/axios";
 
 import Day from "./Day";
 
@@ -18,7 +18,7 @@ export default function UpcomingWeek({}) {
                 const start = format(today, "yyyy-MM-dd");
                 const end = format(addDays(today, 6), "yyyy-MM-dd");
 
-                const res = await axios.get("/api/inrange", {
+                const res = await api.get("/api/inrange", {
                     params: { start, end }
                 });
 

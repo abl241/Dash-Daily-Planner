@@ -1,7 +1,7 @@
-import express from 'express';
+const express = require('express');
 const router = express.Router();
-import pool from '../db'; // adjust to your pool import
-import {
+const pool = require('../db');
+const {
   parseISO,
   addDays,
   addWeeks,
@@ -13,7 +13,8 @@ import {
   startOfDay,
   endOfDay,
   differenceInCalendarDays
-} from 'date-fns';
+} = require('date-fns');
+const authenticateToken = require('../middleware/auth');
 
 /**
  * Helper: map full day name ("Monday") -> JS getDay index (1)
@@ -285,6 +286,7 @@ function expandRepeatingItem(item, { kind, startWindow, endWindow }) {
 router.get('/inrange', async (req, res) => {
   try {
     const userId = req.user.id;
+
     const { start, end } = req.query;
 
     if (!start || !end) {
@@ -365,4 +367,4 @@ router.get('/inrange', async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;
