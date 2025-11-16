@@ -5,7 +5,7 @@ import api from "./../../api/axios";
 
 import Day from "./Day";
 
-export default function UpcomingWeek({}) {
+export default function UpcomingWeek({ refreshKey }) {
     const [weekData, setWeekData] = useState([]);
     const [focusedDate, setFocusedDate] = useState(startOfToday());
 
@@ -31,7 +31,7 @@ export default function UpcomingWeek({}) {
         };
 
         fetchWeekData();
-    }, []);
+    }, [ refreshKey ]);
 
     const handleFocus = (day) => setFocusedDate(day);
 

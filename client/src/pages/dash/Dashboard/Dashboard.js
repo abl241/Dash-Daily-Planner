@@ -12,6 +12,8 @@ import NewItemModal from "../../../components/NewItemModal";
 import Button from "../../../components/Button";
 
 export default function Dashboard() {
+    const [ refreshKey, setRefreshKey ] = useState(0);
+    
     // layout stuff
     const [layout, setLayout] = useState([
         { i: "pomodoro", x: 0, y: 0, w: 3, h: 2 }, // temporary
@@ -37,6 +39,7 @@ export default function Dashboard() {
         } catch (err) {
             console.error("Error adding new item:", err);
         }
+        setRefreshKey(prev => prev + 1);
     };
 
 
@@ -45,7 +48,7 @@ export default function Dashboard() {
             <section className={s.mainSection}>
                 <div className={s.upcomingWeekSection}>
                     {/* insert overview components here */}
-                    <UpcomingWeek/>
+                    <UpcomingWeek refreshKey={refreshKey}/>
                     <Button variant="primary" onClick={() => setIsModalOpen(true)}>Add New</Button>
                     <NewItemModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={handleAdd}/>
                 </div>

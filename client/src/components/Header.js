@@ -8,24 +8,34 @@ export default function Header() {
     const [greeting, setGreeting] = useState("");
     const user = JSON.parse(localStorage.getItem("user"));
     const first_name = user?.first_name || "User";
+    const [ currentTime, setCurrentTime ] = useState(new Date());
 
     useEffect(() => {
         const today = new Date();
 
-    // Greeting logic
-    const hour = today.getHours();
-    if (hour < 12) setGreeting("Good morning");
-    else if (hour < 18) setGreeting("Good afternoon");
-    else setGreeting("Good evening");
+        // Greeting logic
+        const hour = currentTime.getHours();
+        if (hour < 12) setGreeting("Good morning");
+        else if (hour < 18) setGreeting("Good afternoon");
+        else setGreeting("Good evening");
 
-    // Date formatting
-    const formatted = today.toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "short",
-        day: "numeric",
-    });
-    setDate(formatted);
-}, []);
+        // Date formatting
+        const formatted = currentTime.toLocaleDateString("en-US", {
+            weekday: "long",
+            month: "short",
+            day: "numeric",
+        });
+        setDate(formatted);
+    }, []);
+
+    // Update every min
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 60 * 1000);
+
+        return () => clearInterval(interval);
+    }, []);
 
   return (
       <header className={s.header}>
