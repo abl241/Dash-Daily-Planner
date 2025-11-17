@@ -3,3 +3,12 @@
     width: 100%;
 
 }
+
+.dayOverviewContainer {
+    margin-top: 2rem;
+    width: 100%;
+    border-radius: .5rem;
+    border: .5rem solid var(--primary-color);
+    box-sizing: border-box;
+    min-height: 14rem;
+}

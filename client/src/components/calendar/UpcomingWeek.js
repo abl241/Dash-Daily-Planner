@@ -57,7 +57,7 @@ export default function UpcomingWeek({ refreshKey }) {
             </div>
 
             <div className={s.dayOverviewContainer}>
-
+                
             </div>
         </div>
     );

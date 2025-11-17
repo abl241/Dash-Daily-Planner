@@ -16,6 +16,7 @@
     transition: all 0.2s ease;
     z-index: 100;
     min-width: 14rem;
+    box-sizing: border-box;
 }
 
 .uwCard > h1 {
