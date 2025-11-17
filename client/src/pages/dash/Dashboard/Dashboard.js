@@ -1,6 +1,6 @@
 import s from "./Dashboard.module.css";
 import DashboardLayout from '../../../components/DashboardLayout';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -25,6 +25,13 @@ export default function Dashboard() {
         setLayout(newLayout);
         localStorage.setItem("dashboardLayout", JSON.stringify(newLayout));
     };
+
+    // update refreshKey every min
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setRefreshKey(prev => prev +1);
+        }, 60 * 1000);
+    }, []);
 
     // modal stuff
     const handleAdd = async (data, type) => { // add handler for reminders (add to separate reminders table)
