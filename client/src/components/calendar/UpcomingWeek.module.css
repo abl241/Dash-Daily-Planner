@@ -11,4 +11,29 @@
     border: .5rem solid var(--primary-color);
     box-sizing: border-box;
     min-height: 14rem;
+    display: flex;
+
+}
+
+.overviewOptionsContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: fit-content;
+}
+
+.focusOption {
+    border: none;
+    background-color: transparent;
+    color: var(--secondary-text-color);
+    width: fit-content;
+    font-size: 1.5rem;
+    transition: all .2s ease;
+
+}
+
+.focusOption.active {
+    color: var(--text-color);
+    font-size: 2.5rem;
+    transition: all .2s ease;
 }

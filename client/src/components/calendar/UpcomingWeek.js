@@ -6,12 +6,14 @@ import api from "./../../api/axios";
 import Day from "./Day";
 
 export default function UpcomingWeek({ refreshKey }) {
-    const [weekData, setWeekData] = useState([]);
-    const [focusedDate, setFocusedDate] = useState(startOfToday());
+    const [ weekData, setWeekData ] = useState([]);
+    const [ focusedDate, setFocusedDate ] = useState(startOfToday());
+    const [ focusedOption, setFocusedOption ] = useState("schedule");
 
+
+    // get week data
     const today = startOfToday();
     const days = [...Array(7)].map((_, i) => addDays(today, i));
-
     useEffect(() => {
         const fetchWeekData = async () => {
             try {
@@ -33,10 +35,13 @@ export default function UpcomingWeek({ refreshKey }) {
         fetchWeekData();
     }, [ refreshKey ]);
 
+    // handling day focus
     const handleFocus = (day) => setFocusedDate(day);
-
     const focusedKey = format(focusedDate, "yyyy-MM-dd");
     const focusedData = weekData[focusedKey] || { tasks: [], events: [] };
+
+    // day overview section
+    
 
     return (
         <div>
@@ -57,7 +62,11 @@ export default function UpcomingWeek({ refreshKey }) {
             </div>
 
             <div className={s.dayOverviewContainer}>
-                
+                <div className={s.overviewOptionsContainer}>
+                    <button className={`${s.focusOption} ${focusedOption === "schedule" ? s.active : ""}`} onClick={() => setFocusedOption("schedule")}>Schedule</button>
+                    <button className={`${s.focusOption} ${focusedOption === "tasks" ? s.active : ""}`} onClick={() => setFocusedOption("tasks")}>Tasks</button>
+                    <button className={`${s.focusOption} ${focusedOption === "stats" ? s.active : ""}`} onClick={() => setFocusedOption("stats")}>Stats</button>
+                </div>
             </div>
         </div>
     );
