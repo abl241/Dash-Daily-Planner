@@ -4,6 +4,7 @@ import { addDays, startOfToday, isSameDay, format } from "date-fns";
 import api from "./../../api/axios";
 
 import Day from "./Day";
+import Timeline from "./Timeline";
 
 export default function UpcomingWeek({ refreshKey }) {
     const [ weekData, setWeekData ] = useState([]);
@@ -67,6 +68,11 @@ export default function UpcomingWeek({ refreshKey }) {
                     <button className={`${s.focusOption} ${focusedOption === "tasks" ? s.active : ""}`} onClick={() => setFocusedOption("tasks")}>Tasks</button>
                     <button className={`${s.focusOption} ${focusedOption === "stats" ? s.active : ""}`} onClick={() => setFocusedOption("stats")}>Stats</button>
                 </div>
+                {focusedOption === "schedule" && (
+                    <div className={s.scheduleContents}>
+                        <Timeline/>
+                    </div>
+                )}
             </div>
         </div>
     );
