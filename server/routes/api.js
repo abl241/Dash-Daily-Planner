@@ -318,10 +318,9 @@ router.get('/inrange', async (req, res) => {
         )
       ORDER BY start_time ASC;
     `;
-
     const [tasksResult, eventsResult] = await Promise.all([
-      pool.query(tasksQuery, [userId, start, end]),
-      pool.query(eventsQuery, [userId, start, end]),
+        pool.query(tasksQuery, [userId, start, end]),
+        pool.query(eventsQuery, [userId, start, end]),
     ]);
 
     const baseTasks = tasksResult.rows || [];

@@ -47,7 +47,7 @@ export default function UpcomingWeek({ refreshKey }) {
 
     return (
         <div>
-            <Button onClick={() => console.log(focusedData)}/>
+            <Button onClick={() => console.log(weekData)}/>
             <div className={s.weekContainer}>
                 {days.map((day) => {
                     const key = format(day, "yyyy-MM-dd");
@@ -103,13 +103,13 @@ function groupByDate(tasks, events, startString, endString) {
 
     // ---- EVENTS ----
     events.forEach((event) => {
-        const raw = event.is_occurrence ? event.occurrence_date : event.start_time;
-        const parsed = safeParse(raw);
+        const parsed = safeParse(event.start_time);
         if (!parsed) return;
 
         const dateKey = format(parsed, "yyyy-MM-dd");
         if (map[dateKey]) map[dateKey].events.push(event);
     });
+
 
     return map;
 }
