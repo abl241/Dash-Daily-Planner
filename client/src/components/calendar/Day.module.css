@@ -1,5 +1,5 @@
 .uwCard {
-    border: .5rem solid var(--border-color);
+    border: .5rem solid var(--secondary-color);
     border-radius: .5rem;
     aspect-ratio: 1/1;
     max-width: 14rem;

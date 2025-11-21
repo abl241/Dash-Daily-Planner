@@ -9,6 +9,7 @@ export default function Timeline({}) {
     return(
         <div className={s.dayView}>
             <div className={s.allDaySection}>
+                <span className={s.allDayLabel}>All Day</span>
                 {/* all-day events here */}
             </div>
 

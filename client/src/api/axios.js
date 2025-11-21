@@ -33,44 +33,47 @@ api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
-        
+
         if (error.response?.status === 401 && !originalRequest._retry) {
             if (isRefreshing) {
-                return new Promise(function(resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     failedQueue.push({ resolve, reject });
-                }
-            ).then((token) => {
-                originalRequest.headers.Authorization = `Bearer ${token}`;
-                return axios(originalRequest);
-            }).catch((err) => {
+                }).then((token) => {
+                    originalRequest.headers.Authorization = `Bearer ${token}`;
+                    return axios(originalRequest);
+                }).catch((err) => {
+                    return Promise.reject(err);
+                });
+            }
+
+            originalRequest._retry = true;
+            isRefreshing = true;
+
+            try {
+                const res = await axios.post(
+                    "http://localhost:4000/auth/refresh",
+                    {},
+                    { withCredentials: true }
+                );
+
+                const newToken = res.data.accessToken;
+                localStorage.setItem("token", newToken);
+                api.defaults.headers.common.Authorization = `Bearer ${newToken}`;
+                processQueue(null, newToken);
+                return await api(originalRequest);
+            } catch (err) {
+                processQueue(err, null);
+                localStorage.removeItem("token");
+                window.location.href = "/auth/login";
                 return Promise.reject(err);
-            });
+            } finally {
+                isRefreshing = false;
+            }
         }
-        
-        originalRequest._retry = true;
-        isRefreshing = true;
-        
-        try {
-            const res = await axios.post("http://localhost:5000/auth/refresh",
-                {},
-                { withCredentials: true }
-            );
-            
-            const newToken = res.data.token;
-            localStorage.setItem("token", newToken);
-            api.defaults.headers.common.Authorization = `Bearer ${newToken}`;
-            processQueue(null, newToken);
-            return await api(originalRequest);
-        } catch(err) {
-            processQueue(err, null);
-            localStorage.removeItem("token");
-            window.location.href = "/auth/login";
-            return Promise.reject(err);
-        } finally {
-            isRefreshing = false;
-        }
+
+        return Promise.reject(error);
     }
-    return Promise.reject(error);
-});
+);
+
 
 export default api;

@@ -5,6 +5,7 @@ import api from "./../../api/axios";
 
 import Day from "./Day";
 import Timeline from "./Timeline";
+import Button from "../Button";
 
 export default function UpcomingWeek({ refreshKey }) {
     const [ weekData, setWeekData ] = useState([]);
@@ -46,6 +47,7 @@ export default function UpcomingWeek({ refreshKey }) {
 
     return (
         <div>
+            <Button onClick={() => console.log(focusedData)}/>
             <div className={s.weekContainer}>
                 {days.map((day) => {
                     const key = format(day, "yyyy-MM-dd");
@@ -91,25 +93,28 @@ function groupByDate(tasks, events, startString, endString) {
 
     // ---- TASKS ----
     tasks.forEach((task) => {
-        const dateKey = format(
-            new Date(task.is_occurrence ? task.occurrence_date : task.due_date),
-            "yyyy-MM-dd"
-        );
-        if (map[dateKey]) {
-            map[dateKey].tasks.push(task);
-        }
+        const raw = task.is_occurrence ? task.occurrence_date : task.due_date;
+        const parsed = safeParse(raw);
+        if (!parsed) return; // skip invalid
+
+        const dateKey = format(parsed, "yyyy-MM-dd");
+        if (map[dateKey]) map[dateKey].tasks.push(task);
     });
 
     // ---- EVENTS ----
     events.forEach((event) => {
-        const dateKey = format(
-            new Date(event.is_occurrence ? event.occurrence_date : event.start_time),
-            "yyyy-MM-dd"
-        );
-        if (map[dateKey]) {
-            map[dateKey].events.push(event);
-        }
+        const raw = event.is_occurrence ? event.occurrence_date : event.start_time;
+        const parsed = safeParse(raw);
+        if (!parsed) return;
+
+        const dateKey = format(parsed, "yyyy-MM-dd");
+        if (map[dateKey]) map[dateKey].events.push(event);
     });
 
     return map;
+}
+
+function safeParse(dateString) {
+    const d = new Date(dateString);
+    return isNaN(d) ? null : d;
 }
