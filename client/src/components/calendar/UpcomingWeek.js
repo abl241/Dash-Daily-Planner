@@ -72,7 +72,7 @@ export default function UpcomingWeek({ refreshKey }) {
                 </div>
                 {focusedOption === "schedule" && (
                     <div className={s.scheduleContents}>
-                        <Timeline/>
+                        <Timeline events={focusedData.events}/>
                     </div>
                 )}
             </div>

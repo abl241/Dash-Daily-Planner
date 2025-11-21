@@ -4,9 +4,9 @@
 
 .allDaySection {
     display: flex;
-    gap: .5rem;
-    padding: .5rem;
-    min-height: 24px;
+    gap: 8px;
+    padding: 8px;
+    height: 24px;
     border-bottom: 1px solid var(--border-color);
     background: #fff;
     position: sticky;
@@ -34,7 +34,7 @@
     position: relative;
 }
 .hourRow:first-child {
-    margin-top: 1rem;
+    margin-top: 16px;
 }
 
 .timeLabel {
@@ -44,7 +44,7 @@
     font-size: 12px;
     text-align: right;
     color: var(--secondary-text-color);
-    min-width: 2rem;
+    min-width: 32px;
 }
 
 .hourLine {
