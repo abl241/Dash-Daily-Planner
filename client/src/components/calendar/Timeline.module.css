@@ -29,6 +29,11 @@
     border-top: 1px solid var(--border-color);
 }
 
+.gridAndEvents {
+  position: relative;
+  margin-left: 50px; /* timeline starts here */
+}
+
 .hourRow {
     height: 60px; /* 1 hour = 60px */
     position: relative;
@@ -39,7 +44,7 @@
 
 .timeLabel {
     position: absolute;
-    left: 0;
+    left: -50px;
     top: -12px;
     font-size: 12px;
     text-align: right;
@@ -49,7 +54,7 @@
 
 .hourLine {
     position: absolute;
-    left: 50px;
+    left: 0;
     right: 0;
     top: 0;
     height: 1px;

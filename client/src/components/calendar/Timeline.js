@@ -1,5 +1,5 @@
 import s from "./Timeline.module.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { parseISO, differenceInMinutes, getHours, getMinutes } from "date-fns";
 
 import EventBlock from "./EventBlock";
@@ -47,7 +47,27 @@ export default function Timeline({ events }) {
 
         return groups;
     }
-    function layoutEvents(events, columnWidth = 300, minWidth = 80) {
+    const timelineRef = useRef(null);
+    const [timelineWidth, setTimelineWidth] = useState(0);
+    const labelOffset = 60; // same as .eventBlock left
+    const rightOffset = 10; // same as .eventBlock right
+    const availableWidth = Math.max(0, timelineWidth - labelOffset + rightOffset);
+    useEffect(() => {
+        if (timelineRef.current) {
+            setTimelineWidth(timelineRef.current.offsetWidth);
+        }
+
+        // Optional: handle window resize
+        const handleResize = () => {
+            if (timelineRef.current) {
+                setTimelineWidth(timelineRef.current.offsetWidth);
+            }
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+    function layoutEvents(events, columnWidth, minWidth = 80) {
         const groups = groupOverlappingEvents(events);
 
         return groups.flatMap(group => {
@@ -58,12 +78,12 @@ export default function Timeline({ events }) {
                 ...event,
                 layout: {
                     width,
-                    left: 50 + index * width // 50px is from .hourLine left: 50px
+                    left: index * width // 50px is from .hourLine left: 50px
                 }
             }));
         });
     }
-    const laidOutEvents = layoutEvents(timedEvents);
+    const laidOutEvents = layoutEvents(timedEvents, availableWidth);
 
     const renderedEvents = laidOutEvents.map(event => {
         const start = parseISO(event.start_time);
@@ -72,7 +92,7 @@ export default function Timeline({ events }) {
         const startMinutes = getHours(start) * 60 + getMinutes(start);
         const durationMinutes = differenceInMinutes(end, start);
 
-        const top = startMinutes * 1 + 24 - 8; // add all-day section height; subtract Timeline.allDaySection's (8px) padding
+        const top = startMinutes + 24 - 8 - 16; // add all-day section height (24px); subtract Timeline.allDaySection's (8px) padding; subtract .hourRow:first-child margin-top (16px)
         const height = durationMinutes * 1;
 
         return (
@@ -102,16 +122,19 @@ export default function Timeline({ events }) {
                 </div>
             </div>
 
-            <div className={s.timelineSection}>
-                {hours.map((h) => (
-                    <div key={h} className={s.hourRow}>
-                        <span className={s.timeLabel}><p>{`${h % 12 === 0 ? 12 : h % 12}`}</p>{`${h < 12 ? "AM" : "PM"}`}</span>
-                        <div className={s.hourLine}></div>
+            <div className={s.timelineSection} ref={timelineRef}>
+                <div className={s.gridAndEvents}>
+                    {hours.map((h) => (
+                        <div key={h} className={s.hourRow}>
+                            <span className={s.timeLabel}><p>{`${h % 12 === 0 ? 12 : h % 12}`}</p>{`${h < 12 ? "AM" : "PM"}`}</span>
+                            <div className={s.hourLine}></div>
+                        </div>
+                    ))}
+                    {/* event blocks */}
+                    <div className={s.eventsLayer}>
+                        {renderedEvents}
                     </div>
-                ))}
-                {/* event blocks */}
-                <div className={s.eventsLayer}>
-                    {renderedEvents}
+
                 </div>
             </div>
         </div>

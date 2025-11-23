@@ -47,7 +47,6 @@ export default function UpcomingWeek({ refreshKey }) {
 
     return (
         <div>
-            <Button onClick={() => console.log(weekData)}/>
             <div className={s.weekContainer}>
                 {days.map((day) => {
                     const key = format(day, "yyyy-MM-dd");
