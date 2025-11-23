@@ -16,7 +16,13 @@ export default function Timeline({ events }) {
         return end - start >= 24 * 60 * 60 * 1000;
     }
     const allDayEvents = events.filter(event => isAllDay(event));
-    const timedEvents = events.filter(event => !isAllDay(event));
+    const timedEvents = events.filter(event => !isAllDay(event)).map(
+        e => ({
+            ...e,
+            start: parseISO(e.start_time),
+            end: parseISO(e.end_time)
+        })
+    );
 
     // handles overlapping events
     function eventsOverlap(a, b) {
@@ -52,7 +58,7 @@ export default function Timeline({ events }) {
                 ...event,
                 layout: {
                     width,
-                    left: index * width
+                    left: 50 + index * width // 50px is from .hourLine left: 50px
                 }
             }));
         });

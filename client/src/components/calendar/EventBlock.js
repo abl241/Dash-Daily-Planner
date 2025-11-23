@@ -7,10 +7,11 @@ export default function EventBlock({ event, top, height, left, width }) {
         style={{
             top: `${top}px`,
             height: `${height}px`,
-            left: "60px", // adjust if you want padding or multiple columns
+            left: `${left}px`,
+            width: `${width}px`,
         }}
         >
-        {event.name}
+            {event.name}
         </div>
     );
 }
