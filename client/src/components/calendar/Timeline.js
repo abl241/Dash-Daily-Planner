@@ -5,7 +5,7 @@ import { parseISO, differenceInMinutes, getHours, getMinutes } from "date-fns";
 import EventBlock from "./EventBlock";
 import { Loader } from "three/src/Three.Core.js";
 
-export default function Timeline({ events }) {
+export default function Timeline({ events, onSelectEvent }) {
     const hours = Array.from({ length: 24 }, (_, i) => i);
 
     // Helper: detect all-day events
@@ -99,6 +99,7 @@ export default function Timeline({ events }) {
             <EventBlock
                 key={event.master_id + event.start_time}
                 event={event}
+                onSelectEvent={onSelectEvent}
                 top={top}
                 height={height}
                 left={event.layout.left}

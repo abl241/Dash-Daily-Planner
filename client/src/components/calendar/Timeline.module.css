@@ -24,6 +24,7 @@
 .timelineSection {
     position: relative;
     overflow-y: scroll;
+    overflow-x: scroll;
     height: 30vh; /* everything except the all-day section */
     min-width: 50vw;
     border-top: 1px solid var(--border-color);

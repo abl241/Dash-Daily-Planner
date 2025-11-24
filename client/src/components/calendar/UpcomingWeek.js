@@ -42,7 +42,11 @@ export default function UpcomingWeek({ refreshKey }) {
     const focusedKey = format(focusedDate, "yyyy-MM-dd");
     const focusedData = weekData[focusedKey] || { tasks: [], events: [] };
 
-    // day overview section
+    // handle selecting event
+    const [ selectedEvent, setSelectedEvent ] = useState(null);
+    const handleSelectEvent = (event) => {
+        setSelectedEvent(event);
+    }
     
 
     return (
@@ -70,8 +74,15 @@ export default function UpcomingWeek({ refreshKey }) {
                     <button className={`${s.focusOption} ${focusedOption === "stats" ? s.active : ""}`} onClick={() => setFocusedOption("stats")}>Stats</button>
                 </div>
                 {focusedOption === "schedule" && (
-                    <div className={s.scheduleContents}>
-                        <Timeline events={focusedData.events}/>
+                    <div className={s.scheduleContent}>
+                        <Timeline events={focusedData.events} onSelectEvent={handleSelectEvent}/>
+                        <div classname={s.eventDetailsContainer}>
+                            {selectedEvent ? (
+                                <p>{selectedEvent.name}</p>
+                            ) : (
+                                <p>No selected event.</p>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
