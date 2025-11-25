@@ -40,4 +40,43 @@
 
 .scheduleContent {
     display: flex;
+    width: 100%;
+}
+
+.timelineWrapper {
+    flex-shrink: 0;
+}
+
+.eventDetailsContainer {
+    flex: 1;   
+}
+
+.eventDetailsContent {
+    margin-left: .5rem;
+}
+
+.infoContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.info {
+    flex: 1;
+    min-width: 0;
+}
+
+.timesContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.time {
+    flex: 1;
+    min-width: 0;
+}
+
+.notesContainer {
+    flex: 1;
+    min-width: 0;
 }

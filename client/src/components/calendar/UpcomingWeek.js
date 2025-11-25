@@ -47,7 +47,7 @@ export default function UpcomingWeek({ refreshKey }) {
     const handleSelectEvent = (event) => {
         setSelectedEvent(event);
     }
-    
+    console.log(selectedEvent)
 
     return (
         <div>
@@ -75,10 +75,36 @@ export default function UpcomingWeek({ refreshKey }) {
                 </div>
                 {focusedOption === "schedule" && (
                     <div className={s.scheduleContent}>
-                        <Timeline events={focusedData.events} onSelectEvent={handleSelectEvent}/>
-                        <div classname={s.eventDetailsContainer}>
+                        <div className={s.timelineWrapper}>
+                            <Timeline events={focusedData.events} onSelectEvent={handleSelectEvent}/>
+                        </div>
+                        <div className={s.eventDetailsContainer}>
                             {selectedEvent ? (
-                                <p>{selectedEvent.name}</p>
+                                <div className={s.eventDetailsContent}>
+                                    <div>
+                                        <h1>{selectedEvent.name}</h1>
+                                        {/* add category thing*/}
+                                    </div>
+                                    <div className={s.infoContainer}>
+                                        <div className={s.info}>
+                                            <p>Location:</p>
+                                            <h2>{`${selectedEvent.original.location ? selectedEvent.original.location : "No location"}`}</h2>
+                                            <div className={s.timesContainer}>
+                                                <div className={s.time}>
+                                                    <p>From:</p>
+                                                    <h2>{format(selectedEvent.start, "h:mm a")}</h2>
+                                                </div>
+                                                <div className={s.time}>
+                                                    <p>To:</p>
+                                                    <h2>{format(selectedEvent.end, "h:mm a")}</h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className={s.notesContainer}>
+                                            <p>Notes:</p>
+                                        </div>
+                                    </div>
+                                </div>
                             ) : (
                                 <p>No selected event.</p>
                             )}
