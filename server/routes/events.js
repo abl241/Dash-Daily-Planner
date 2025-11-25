@@ -8,6 +8,7 @@ function mapEventData(formData, userId) {
         title,
         notes,
         category,
+        category_id,
         link,
         repeat,
         repeatRules,
@@ -21,6 +22,7 @@ function mapEventData(formData, userId) {
         name: title,
         notes,
         category,
+        category_id,
         link,
         is_recurring: repeat,
         repeat_rule: repeat ? JSON.stringify(repeatRules) : null,
@@ -50,8 +52,18 @@ router.post('/', async (req, res) => {
         const userId = req.user.id;
         const data = mapEventData(req.body, userId);
 
-        const newEvent = await pool.query("INSERT INTO events (user_id, name, start_time, end_time, category, notes, is_recurring, repeat_rule) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
-            [ userId, data.name, data.start_time, data.end_time, data.category, data.notes, data.is_recurring, data.repeat_rule ]
+        if (data.category_id) {
+            const check = await pool.query(
+                "SELECT id FROM categories WHERE id = $1 AND user_id = $2",
+                [data.category_id, userId]
+            );
+            if (check.rows.length === 0) {
+                return res.status(400).json({ message: "Invalid category ID" });
+            }
+        }
+
+        const newEvent = await pool.query("INSERT INTO events (user_id, name, start_time, end_time, category, category_id, notes, is_recurring, repeat_rule) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
+            [ userId, data.name, data.start_time, data.end_time, data.category, data.category_id, data.notes, data.is_recurring, data.repeat_rule ]
         );
 
         res.status(201).json(newEvent.rows[0]); 
@@ -134,6 +146,7 @@ router.put('/:id', async (req, res) => {
             start_time,
             end_time,
             category,
+            category_id,
             notes,
             is_recurring,
             repeat_rule,
@@ -144,12 +157,13 @@ router.put('/:id', async (req, res) => {
             start_time = COALESCE($2, start_time),
             end_time = COALESCE($3, end_time),
             category = COALESCE($4, category),
-            notes = COALESCE($5, notes),
-            is_recurring = COALESCE($6, is_recurring),
-            repeat_rule = COALESCE($7, repeat_rule),
+            category_id = $5,
+            notes = COALESCE($6, notes),
+            is_recurring = COALESCE($7, is_recurring),
+            repeat_rule = COALESCE($8, repeat_rule),
             updated_at = CURRENT_TIMESTAMP
-            WHERE id = $8 AND user_id = $9 RETURNING *`,
-            [ name, start_time, end_time, category, notes, is_recurring, repeat_rule, id, userId ]
+            WHERE id = $9 AND user_id = $10 RETURNING *`,
+            [ name, start_time, end_time, category, category_id, notes, is_recurring, repeat_rule, id, userId ]
         );
 
         res.json(updateEvent.rows[0]);

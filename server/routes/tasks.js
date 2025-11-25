@@ -9,6 +9,7 @@ function mapTaskData(formData, userId) {
         title,
         notes,
         category,
+        category_id,
         link,
         repeat,
         repeatRules,
@@ -20,6 +21,7 @@ function mapTaskData(formData, userId) {
         name: title,
         due_date: formattedDueDate,
         category,
+        category_id,
         notes,
         link,
         is_completed: false,
@@ -48,8 +50,18 @@ router.post('/', async (req, res) => {
         const userId = req.user.id;
         const data = mapTaskData(req.body, userId);
 
-        const newTask = await pool.query("INSERT INTO tasks (user_id, name, due_date, category, notes, link, is_completed, is_recurring, repeat_rule) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
-            [ userId, data.name, data.due_date, data.category, data.notes, data.link, data.is_completed, data.is_recurring, data.repeat_rule ]
+        if (data.category_id) {
+            const check = await pool.query(
+                "SELECT id FROM categories WHERE id = $1 AND user_id = $2",
+                [data.category_id, userId]
+            );
+            if (check.rows.length === 0) {
+                return res.status(400).json({ message: "Invalid category ID" });
+            }
+        }
+
+        const newTask = await pool.query("INSERT INTO tasks (user_id, name, due_date, category, category_id, notes, link, is_completed, is_recurring, repeat_rule) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
+            [ userId, data.name, data.due_date, data.category, data.category_id, data.notes, data.link, data.is_completed, data.is_recurring, data.repeat_rule ]
         );
 
         res.status(201).json(newTask.rows[0]);
@@ -128,6 +140,7 @@ router.put('/:id', async (req, res) => {
             name,
             due_date,
             category,
+            category_id,
             notes,
             link,
             is_completed,
@@ -139,14 +152,15 @@ router.put('/:id', async (req, res) => {
             name = COALESCE($1, name),
             due_date = COALESCE($2, due_date),
             category = COALESCE($3, category),
-            notes = COALESCE($4, notes),
-            link = COALESCE($5, link),
-            is_completed = COALESCE($6, is_completed),
-            is_recurring = COALESCE($7, is_recurring),
-            repeat_rule = COALESCE($8, repeat_rule),
+            category_id = $5,
+            notes = COALESCE($5, notes),
+            link = COALESCE($6, link),
+            is_completed = COALESCE($7, is_completed),
+            is_recurring = COALESCE($8, is_recurring),
+            repeat_rule = COALESCE($9, repeat_rule),
             updated_at = CURRENT_TIMESTAMP
-            WHERE id = $9 AND user_id = $10 RETURNING *`,
-            [ name, due_date, category, notes, link, is_completed, is_recurring, repeat_rule, id, userId ]
+            WHERE id = $10 AND user_id = $11 RETURNING *`,
+            [ name, due_date, category, category_id, notes, link, is_completed, is_recurring, repeat_rule, id, userId ]
         );
         
         if(updateTask.rows.length === 0) {

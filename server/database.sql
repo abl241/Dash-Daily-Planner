@@ -18,6 +18,7 @@ CREATE TABLE tasks (
     name VARCHAR(200) NOT NULL,
     due_date TIMESTAMP,
     category VARCHAR(100),
+    category_id INT REFERENCES categories(id) ON DELETE SET NULL,
     notes TEXT,
     link TEXT,
 
@@ -48,6 +49,7 @@ CREATE TABLE events (
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP,
     category VARCHAR(100),
+    category_id INT REFERENCES categories(id) ON DELETE SET NULL,
     notes TEXT,
     link TEXT,
 
@@ -126,3 +128,14 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
 
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON refresh_tokens (user_id);
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_token_hash ON refresh_tokens (token_hash);
+
+--Categories table
+CREATE TABLE categories (
+  id SERIAL PRIMARY KEY,
+  user_id INT REFERENCES users(id) ON DELETE CASCADE,  -- each category belongs to a user
+  name VARCHAR(50) NOT NULL,                          -- category name
+  color VARCHAR(7) DEFAULT '#FFFFFF',                 -- hex color
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE(user_id, name)                               -- unique per user
+);
