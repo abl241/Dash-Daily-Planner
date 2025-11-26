@@ -134,7 +134,7 @@ CREATE TABLE categories (
   id SERIAL PRIMARY KEY,
   user_id INT REFERENCES users(id) ON DELETE CASCADE,  -- each category belongs to a user
   name VARCHAR(50) NOT NULL,                          -- category name
-  color VARCHAR(7) DEFAULT '#FFFFFF',                 -- hex color
+  color VARCHAR(7) DEFAULT '#38BDF8',                 -- hex color
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   UNIQUE(user_id, name)                               -- unique per user
