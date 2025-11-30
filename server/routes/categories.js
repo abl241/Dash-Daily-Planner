@@ -25,6 +25,26 @@ router.post('/', async (req, res) => {
 
 // ************************************************* Get a category by ID **********************************************************
 
+router.get('/:id', async (req, res) => {
+    try {
+        const userID = req.user.id;
+        const { id } = req.params;
+
+        const category = await pool.query("SELECT * FROM categories WHERE id = $1 AND user_id = $2",
+            [ id, userID ]
+        );
+
+        if(category.rows.length === 0) {
+            return res.status(404).json({ message: "Category not found" });
+        }
+
+        res.json(category.rows[0]);
+    } catch (err) {
+        console.error("Error fetching category: ", err.message);
+        res.status(500).json({ message: "Server error fetching category" });
+    }
+});
+
 
 // ************************************************* Get all categories for a user **********************************************************
 
