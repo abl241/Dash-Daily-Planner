@@ -88,6 +88,31 @@ router.delete('/:id', async (req, res) => {
 
 // ************************************************* Update a category by ID **********************************************************
 
+router.put('/:id', async (req, res) => {
+    try {
+        const userID = req.user.id;
+        const { id } = req.params;
+        const { name, color } = req.body;
+
+        if(!name || name.trim() === "") {
+            return res.status(400).json({ message: "Category requires a name"});
+        }
+
+        const updateCategory = await pool.query("UPDATE categories SET name = $1, color = $2 WHERE id = $3 AND user_id = $4 RETURNING *",
+            [ name, color, id, userID ]
+        );
+
+        if(updateCategory.rows.length === 0) {
+            return res.status(404).json({ message: "Category not found or not authorized" });
+        }
+
+        res.json(updateCategory.rows[0]);
+    } catch (err) {
+        console.error("Error updating category: ", err.message);
+        res.status(500).json({ message: "Server error updating category" });
+    }
+});
+
 
 
 modules.exports = router;
