@@ -48,9 +48,43 @@ router.get('/:id', async (req, res) => {
 
 // ************************************************* Get all categories for a user **********************************************************
 
+router.get('/', async (req, res) => {
+    try {
+        const userID = req.user.id;
+
+        const categories = await pool.query("SELECT * FROM categories WHERE user_id = $1",
+            [ userID ]
+        );
+
+        res.json(categories.rows);
+    } catch (err) {
+        console.error("Error fetching categories: ", err.message);
+        res.status(500).json({ message: "Server error fetching categories" });
+    }
+});
+
 
 // ************************************************* Delete a category by ID **********************************************************
 
+router.delete('/:id', async (req, res) => {
+    try {
+        const userID = req.user.id;
+        const { id } = req.params;
+
+        const deleteCategory = await pool.query("DELETE FROM categories WHERE id = $1 AND user_id = $2 RETURNING *",
+            [ id, userID ]
+        );
+
+        if(deleteCategory.rows.length === 0) {
+            return res.status(404).json({ message: "Category not found" });
+        }
+
+        res.json({ message: "Category deleted successfully" });
+    } catch (err) {
+        console.error("Error deleting category: ", err.message);
+        res.status(500).json({ message: "Server error deleting category" });
+    }
+});
 
 // ************************************************* Update a category by ID **********************************************************
 
