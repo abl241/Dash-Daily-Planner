@@ -28,6 +28,9 @@ app.use('/events', authenticateToken, eventRoutes);
 const remindersRoutes = require('./routes/reminders');
 app.use('/reminders', authenticateToken, remindersRoutes);
 
+const categoriesRoutes = require('./routes/categories');
+app.use('/categories', authenticateToken, categoriesRoutes);
+
 const widgetsRoutes = require('./routes/widgets');
 app.use('/widgets', authenticateToken, widgetsRoutes);
 

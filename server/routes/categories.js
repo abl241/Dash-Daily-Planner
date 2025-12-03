@@ -8,7 +8,7 @@ router.post('/', async (req, res) => {
     try {
         const userID = req.user.id;
         const { name, color } = req.body;
-
+        
         if(!name || name.trim() === "") {
             return res.status(400).json({ message: "Category requires a name"});
         }
@@ -23,17 +23,35 @@ router.post('/', async (req, res) => {
     }
 });
 
+// ************************************************* Search for category **********************************************************
+
+router.get('/search', async (req, res) => {
+    try {
+        const userID = req.user.id;
+        const { q } = req.query || "";
+
+        const results = await pool.query("SELECT * FROM categories WHERE user_id = $1 AND name ILIKE $2 ORDER BY name",
+            [ userID, `%${q}%` ]
+        );
+
+        res.json(results.rows);
+    } catch (err) {
+        console.error("Error searching categories: ", err.message);
+        res.status(500).json({ message: "Server error searching categories" });
+    }
+});
+
 // ************************************************* Get a category by ID **********************************************************
 
 router.get('/:id', async (req, res) => {
     try {
         const userID = req.user.id;
         const { id } = req.params;
-
+        
         const category = await pool.query("SELECT * FROM categories WHERE id = $1 AND user_id = $2",
             [ id, userID ]
         );
-
+        
         if(category.rows.length === 0) {
             return res.status(404).json({ message: "Category not found" });
         }
@@ -113,23 +131,4 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// ************************************************* Search for category **********************************************************
-
-router.get('/search', async (req, res) => {
-    try {
-        const userID = req.user.id;
-        const { q } = req.query || "";
-
-        const results = await pool.query("SELECT FROM categories WHERE user_id = $1 AND name ILIKE $2 ORDER BY name",
-            [ userID, `%${q}%` ]
-        );
-
-        res.json(results.rows);
-    } catch (err) {
-        console.error("Error searching categories: ", err.message);
-        res.status(500).json({ message: "Server error searching categories" });
-    }
-});
-
-
-modules.exports = router;
+module.exports = router;

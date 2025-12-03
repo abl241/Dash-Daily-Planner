@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 
 import Button from "./Button"
 import DropdownChecklist from "./DropdownChecklist";
+import CategoryAdder from "./CategoryAdder";
 
 export default function NewItemModal({ isOpen, onClose, onAdd }) {
     const [type, setType] = useState("task"); // "task" or "event"
@@ -725,6 +726,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                             )}
                         </div>
                     </div>
+                            <CategoryAdder></CategoryAdder>
                             <Button onClick={() => console.log(formData)}>log formData</Button>
                             <Button onClick={handleSubmit}>Submit</Button>
                 </form>
