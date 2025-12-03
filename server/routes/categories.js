@@ -113,6 +113,23 @@ router.put('/:id', async (req, res) => {
     }
 });
 
+// ************************************************* Search for category **********************************************************
+
+router.get('/search', async (req, res) => {
+    try {
+        const userID = req.user.id;
+        const { q } = req.query || "";
+
+        const results = await pool.query("SELECT FROM categories WHERE user_id = $1 AND name ILIKE $2 ORDER BY name",
+            [ userID, `%${q}%` ]
+        );
+
+        res.json(results.rows);
+    } catch (err) {
+        console.error("Error searching categories: ", err.message);
+        res.status(500).json({ message: "Server error searching categories" });
+    }
+});
 
 
 modules.exports = router;
