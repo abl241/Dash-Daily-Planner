@@ -32,7 +32,7 @@ router.post("/register", async (req, res) => {
             [ first_name, last_name, email, hashedPassword ]
         );
 
-        const token = generateAccessToken(newUser.rows[0]);
+        const token = generateAccessToken(newUser.rows[0].id);
         
         res.status(201).json({
             message: "User registered successfully",
@@ -67,7 +67,7 @@ router.post("/login", async (req, res) => {
             return res.status(400).json({ message: "Invalid credentials" });
         }
 
-        const token = generateAccessToken(user.rows[0]);
+        const token = generateAccessToken(user.rows[0].id);
         const refreshToken = jwt.sign(
             { id: user.rows[0].id },
             process.env.REFRESH_TOKEN_SECRET,
@@ -79,6 +79,14 @@ router.post("/login", async (req, res) => {
         await pool.query("INSERT INTO refresh_tokens (user_id, token_hash, user_agent, ip_address, created_at, expires_at, revoked) VALUES ($1, $2, $3, $4, NOW(), $5, false)",
             [ user.rows[0].id, hashedToken, req.headers["user-agent"] || null, req.ip || null, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)]
         );
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+            path: "/",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
 
         res.json({
             message: "Login successful",
@@ -119,23 +127,25 @@ router.post("/refresh", async (req, res) => {
         if(!refreshToken) {
             return res.status(401).json({ message: "No refresh token provided" });
         }
-
+        
         const hashedToken = crypto.createHash("sha256").update(refreshToken).digest("hex");
-
+        
         const tokenResult = await pool.query("SELECT * FROM refresh_tokens WHERE token_hash = $1 AND revoked = false AND expires_at > NOW()",
             [ hashedToken ]
         );
         if(tokenResult.rows.length === 0) {
             return res.status(403).json({ message: "Invalid refresh token" });
         }
-
+        
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
             if(err) {
                 console.log("Refresh token verification error: ", err.message);
                 return res.status(403).json({ message: "Invalid or expired refresh token" });
             }
-
+            
             const newAccessToken = generateAccessToken({ id: decoded.id });
+            console.log("Refresh ROUTE CALLED");
+            console.log("Returning new access token:", newAccessToken);
             res.json({ accessToken: newAccessToken });
         })
     } catch (err) {

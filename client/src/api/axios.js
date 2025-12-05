@@ -50,13 +50,10 @@ api.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                const res = await axios.post(
-                    "http://localhost:4000/auth/refresh",
-                    {},
-                    { withCredentials: true }
-                );
+                const res = await api.post("/auth/refresh");
 
                 const newToken = res.data.accessToken;
+                console.log("New token from refresh route:", newToken);
                 localStorage.setItem("token", newToken);
                 api.defaults.headers.common.Authorization = `Bearer ${newToken}`;
                 processQueue(null, newToken);
