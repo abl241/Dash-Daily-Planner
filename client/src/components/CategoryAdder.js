@@ -20,6 +20,26 @@ export default function CategoryAdder({ onCategoryAdded }) {
         return () => clearTimeout(timeout);
     }, [query]);
 
+    const exists = results.some(
+        c => c.name.toLowerCase() === query.toLowerCase()
+    );
+
+    const handleCreateNew = async () => {
+        try {
+            const res = await api.post("/categories", { name: query });
+            const newCat = res.data;
+
+            setSelectedCategory(newCat);
+            setQuery(newCat.name);
+            setShowDropdown(false);
+
+            // Pass created category upward
+            onCategoryAdded(newCat);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
         <div>
             <input
@@ -34,8 +54,9 @@ export default function CategoryAdder({ onCategoryAdded }) {
                 onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
                 placeholder="Search or create category"
             />
-            {showDropdown && results.length > 0 && (
+            {showDropdown && (
                 <div className={s.dropdown}>
+                    {/* Existing results */}
                     {results.map(category => (
                         <div
                             key={category.id}
@@ -44,25 +65,24 @@ export default function CategoryAdder({ onCategoryAdded }) {
                                 setSelectedCategory(category);
                                 setQuery(category.name);
                                 setShowDropdown(false);
+                                onCategoryAdded(category);
                             }}
                         >
                             {category.name}
                         </div>
                     ))}
+
+                    {/* Add new option — visible only when not an exact match */}
+                    {query.trim() !== "" && !exists && (
+                        <div
+                            className={s.createNew}
+                            onClick={handleCreateNew}
+                        >
+                            + Add "{query}" as a new category
+                        </div>
+                    )}
                 </div>
             )}
-            <button
-                className={s.addButton}
-                onClick={() => {
-                    const categoryToAdd = selectedCategory || { name: query };
-                    onCategoryAdded(categoryToAdd);
-                    setQuery("");
-                    setSelectedCategory(null);
-                }}
-                disabled={query.trim() === ""}
-            >
-                Add Category
-            </button>
         </div>
     );
 }
