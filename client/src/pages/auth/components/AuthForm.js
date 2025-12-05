@@ -1,8 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-import api from "../../../api/axios.js"
+import api, { scheduleRefresh } from "../../../api/axios.js"
 
 import Button from "../../../components/Button.js"
 import s from "./AuthForm.module.css";
@@ -25,6 +24,8 @@ export default function AuthForm({ type }) {
 
         if(isLogin) {
             const { token, user } = res.data;
+
+            // Store token and user
             localStorage.setItem("token", token);
             localStorage.setItem("user", JSON.stringify({
                 first_name: user.first_name,
@@ -32,6 +33,10 @@ export default function AuthForm({ type }) {
                 email: user.email,
                 id: user.id
             }));
+
+            // Schedule auto-refresh 1 min before expiry
+            scheduleRefresh(token);
+
             navigate("/dash/dashboard");
         }
 
@@ -39,7 +44,8 @@ export default function AuthForm({ type }) {
     } catch (err) {
         setMessage(err.response?.data?.error || "Something went wrong");
     }
-  };
+};
+
 
     return (
         <div className={s.container}>
