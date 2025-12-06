@@ -144,8 +144,6 @@ router.post("/refresh", async (req, res) => {
             }
             
             const newAccessToken = generateAccessToken({ id: decoded.id });
-            console.log("Refresh ROUTE CALLED");
-            console.log("Returning new access token:", newAccessToken);
             res.json({ accessToken: newAccessToken });
         })
     } catch (err) {
