@@ -67,7 +67,7 @@ router.post("/login", async (req, res) => {
             return res.status(400).json({ message: "Invalid credentials" });
         }
 
-        const token = generateAccessToken(user.rows[0].id);
+        const token = generateAccessToken({ id: user.rows[0].id });
         const refreshToken = jwt.sign(
             { id: user.rows[0].id },
             process.env.REFRESH_TOKEN_SECRET,

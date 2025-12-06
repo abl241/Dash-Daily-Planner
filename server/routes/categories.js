@@ -29,11 +29,12 @@ router.get('/search', async (req, res) => {
     try {
         const userID = req.user.id;
         const { q } = req.query || "";
-
+        
         const results = await pool.query("SELECT * FROM categories WHERE user_id = $1 AND name ILIKE $2 ORDER BY name",
             [ userID, `%${q}%` ]
         );
-
+        
+        console.log(userID, q, results.rows);
         res.json(results.rows);
     } catch (err) {
         console.error("Error searching categories: ", err.message);

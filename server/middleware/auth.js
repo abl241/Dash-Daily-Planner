@@ -19,7 +19,7 @@ function authenticateToken(req, res, next) {
     }
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded.user || decoded;
+        req.user = decoded.user ? decoded.user : decoded;
         next();
     } catch (err) {
         console.error("JWT authentification failed: ", err.message);
