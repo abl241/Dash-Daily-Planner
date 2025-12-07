@@ -12,6 +12,7 @@ export default function CategoryAdder({ onCategoryAdded }) {
         const timeout = setTimeout(() => {
             if(query.trim() != "") {
                 api.get(`/categories/search?q=${query}`).then(res => setResults(res.data));
+                console.log(results);
             } else {
                 setResults([]);
             }
@@ -41,7 +42,7 @@ export default function CategoryAdder({ onCategoryAdded }) {
     };
 
     return (
-        <div>
+        <div className={s.container}>
             <input
                 className={s.input}
                 type="text"
