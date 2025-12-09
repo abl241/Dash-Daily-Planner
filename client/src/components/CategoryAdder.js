@@ -70,6 +70,7 @@ export default function CategoryAdder({ onCategoryAdded }) {
                             }}
                         >
                             {category.name}
+                            <button className={s.color} style={{ backgroundColor: `${category.color}` }}/>
                         </div>
                     ))}
 

@@ -544,7 +544,8 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                         </div>
                         <div className={s.categoryDiv}>
                             <label>Category</label>
-                            <input name="category" value={formData.category} onChange={handleChange}/> {/* category */}
+                            {/* <input name="category" value={formData.category} onChange={handleChange}/> */}
+                            <CategoryAdder/>{/* category */}
                         </div>
                     </div>
 
@@ -726,7 +727,6 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                             )}
                         </div>
                     </div>
-                            <CategoryAdder></CategoryAdder>
                             <Button onClick={() => console.log(formData)}>log formData</Button>
                             <Button onClick={handleSubmit}>Submit</Button>
                 </form>
