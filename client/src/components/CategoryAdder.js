@@ -2,11 +2,14 @@ import s from './CategoryAdder.module.css';
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
 
+import ColorPicker from './ColorPicker';
+
 export default function CategoryAdder({ onCategoryAdded }) {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [openColorPicker, setOpenColorPicker] = useState(null);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -70,7 +73,12 @@ export default function CategoryAdder({ onCategoryAdded }) {
                             }}
                         >
                             {category.name}
-                            <button className={s.color} style={{ backgroundColor: `${category.color}` }}/>
+                            <div onClick={(e) => e.stopPropagation()}>
+                                <button className={s.color} onClick={() => setOpenColorPicker(category.id)} type="button" style={{ backgroundColor: `${category.color}` }}/>
+                                {openColorPicker === category.id && (
+                                    <ColorPicker/>
+                                )}
+                            </div>
                         </div>
                     ))}
 

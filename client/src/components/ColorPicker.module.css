@@ -1,0 +1,39 @@
+.container {
+    position: relative;
+}
+
+.colorPreview {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.picker {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    padding: 12px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.hexInput {
+    box-sizing: border-box;
+    background-color: transparent;
+    width: 100%;
+    padding: 1rem;
+    margin-top: 1rem;
+    border: none;
+    border-radius: .5rem;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.hexInput:focus {
+    outline: none;
+    box-shadow: none;
+    transform: none;
+}
