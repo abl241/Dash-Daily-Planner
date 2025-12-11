@@ -4,18 +4,17 @@ import api from '../api/axios';
 
 import ColorPicker from './ColorPicker';
 
-export default function CategoryAdder({ onCategoryAdded }) {
+export default function CategoryAdder({ value, onCategoryAdded }) {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [showDropdown, setShowDropdown] = useState(false);
-    const [openColorPicker, setOpenColorPicker] = useState(null);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
             if(query.trim() != "") {
                 api.get(`/categories/search?q=${query}`).then(res => setResults(res.data));
-                console.log(results);
+                // console.log(results);
             } else {
                 setResults([]);
             }
@@ -30,7 +29,7 @@ export default function CategoryAdder({ onCategoryAdded }) {
 
     const handleCreateNew = async () => {
         try {
-            const res = await api.post("/categories", { name: query });
+            const res = await api.post("/categories", { name: query, color: "#38BDF8" });
             const newCat = res.data;
 
             setSelectedCategory(newCat);
@@ -49,14 +48,17 @@ export default function CategoryAdder({ onCategoryAdded }) {
             <input
                 className={s.input}
                 type="text"
-                value={query}
+                value={value}
                 onChange={e => {
-                    setQuery(e.target.value);
+                    const newValue = e.target.value;
+
+                    setQuery(newValue);
+                    onCategoryAdded({ name: newValue });
                     setShowDropdown(true);
                 }}
                 onFocus={() => setShowDropdown(true)}
                 onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                placeholder="Search or create category"
+                placeholder={"Search or create category"}
             />
             {showDropdown && (
                 <div className={s.dropdown}>
@@ -73,12 +75,7 @@ export default function CategoryAdder({ onCategoryAdded }) {
                             }}
                         >
                             {category.name}
-                            <div onClick={(e) => e.stopPropagation()}>
-                                <button className={s.color} onClick={() => setOpenColorPicker(category.id)} type="button" style={{ backgroundColor: `${category.color}` }}/>
-                                {openColorPicker === category.id && (
-                                    <ColorPicker/>
-                                )}
-                            </div>
+                            <div className={s.color} style={{background: category.color}}/>
                         </div>
                     ))}
 

@@ -38,6 +38,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         title: "",
         notes: "",
         category: "",
+        category_id: null,
         reminders: [],
         repeat: false,
         repeatRules: {unit: "days", interval: "", selectedDays: [], endRules: {type: "never", count: "", month: defaultDate.month, day: defaultDate.day, year: defaultDate.year}},
@@ -434,6 +435,15 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
         });
     };
 
+    // Handle category selection
+    const onCategoryAdded = (cat) => {
+        setFormData((prev) => ({
+            ...prev,
+            category: cat.name,
+            category_id: cat.id
+        }));
+    };
+
     const handleSubmit = (e) => { // ensure end date is after start date; no required fields are left blank; check if reminder/repeat is on or give "" values; only values for selected endrepeat rules are given
         e.preventDefault();
 
@@ -545,7 +555,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                         <div className={s.categoryDiv}>
                             <label>Category</label>
                             {/* <input name="category" value={formData.category} onChange={handleChange}/> */}
-                            <CategoryAdder/>{/* category */}
+                            <CategoryAdder value={formData.category} onCategoryAdded={onCategoryAdded}/>{/* category */}
                         </div>
                     </div>
 
