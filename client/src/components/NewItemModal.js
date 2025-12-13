@@ -471,6 +471,10 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
                 return;
             }
         }
+        if(formData.category_id === undefined && formData.category.trim() != "") {
+            alert("Please provide valid category or create a new one.");
+            return;
+        }
 
         // validate start/end date
         if(type === "event") {

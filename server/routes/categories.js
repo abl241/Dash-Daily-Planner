@@ -34,7 +34,6 @@ router.get('/search', async (req, res) => {
             [ userID, `%${q}%` ]
         );
         
-        console.log(userID, q, results.rows);
         res.json(results.rows);
     } catch (err) {
         console.error("Error searching categories: ", err.message);
