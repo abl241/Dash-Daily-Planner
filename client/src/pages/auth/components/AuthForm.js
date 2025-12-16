@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import api, { scheduleRefresh } from "../../../api/axios.js"
+import api from "../../../api/axios.js"
 
 import Button from "../../../components/Button.js"
 import s from "./AuthForm.module.css";
@@ -33,10 +33,6 @@ export default function AuthForm({ type }) {
                 email: user.email,
                 id: user.id
             }));
-
-            // Schedule auto-refresh 1 min before expiry
-            scheduleRefresh(token);
-
             navigate("/dash/dashboard");
         }
 

@@ -8,15 +8,8 @@ import DashboardLayout from "./components/DashboardLayout";
 import Dashboard from "./pages/dash/Dashboard/Dashboard";
 import Calendar from "./pages/dash/Calendar/Calendar";
 import Widgets from "./pages/dash/Widgets/Widgets";
-import { scheduleRefresh } from "./api/axios";
 
 function App() {
-
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) scheduleRefresh(token);
-    }, []);
-
     return (
         <Router>
             <Routes>

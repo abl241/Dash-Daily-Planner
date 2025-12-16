@@ -1,45 +1,5 @@
 import axios from "axios";
 
-
-// Helper function to get the expiration timestamp from a JWT
-function getTokenExpiration(token) {
-    if (!token) return null;
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.exp * 1000; // milliseconds
-}
-let refreshTimeout;
-
-export function scheduleRefresh(token) {
-    if (!token) return;
-
-    const exp = getTokenExpiration(token);
-    const now = Date.now();
-    const refreshTime = exp - now - 60 * 1000; // 1 min before expiry
-
-    if (refreshTimeout) clearTimeout(refreshTimeout);
-
-    if (refreshTime > 0) {
-        refreshTimeout = setTimeout(async () => {
-            try {
-                const res = await api.post(
-                    "/auth/refresh",
-                    {},
-                    { withCredentials: true }
-                );
-                const newToken = res.data.accessToken;
-                localStorage.setItem("token", newToken);
-                api.defaults.headers.common.Authorization = `Bearer ${newToken}`;
-                scheduleRefresh(newToken); // schedule next refresh
-            } catch (err) {
-                console.error("Auto refresh failed:", err);
-                localStorage.removeItem("token");
-                window.location.href = "/auth/login";
-            }
-        }, refreshTime);
-    }
-}
-
-
 const api = axios.create({
     baseURL: "http://localhost:4000",
     withCredentials: true,
@@ -75,12 +35,13 @@ api.interceptors.response.use(
         const originalRequest = error.config;
 
         if (error.response?.status === 401 && !originalRequest._retry) {
+            
             if (isRefreshing) {
                 return new Promise(function (resolve, reject) {
                     failedQueue.push({ resolve, reject });
                 }).then((token) => {
                     originalRequest.headers.Authorization = `Bearer ${token}`;
-                    return axios(originalRequest);
+                    return api(originalRequest);
                 }).catch((err) => {
                     return Promise.reject(err);
                 });
