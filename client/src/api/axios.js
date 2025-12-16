@@ -4,6 +4,10 @@ const api = axios.create({
     baseURL: "http://localhost:4000",
     withCredentials: true,
 });
+const refreshApi = axios.create({
+    baseURL: "http://localhost:4000",
+    withCredentials: true,
+});
 
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
@@ -35,7 +39,6 @@ api.interceptors.response.use(
         const originalRequest = error.config;
 
         if (error.response?.status === 401 && !originalRequest._retry) {
-            
             if (isRefreshing) {
                 return new Promise(function (resolve, reject) {
                     failedQueue.push({ resolve, reject });
@@ -51,7 +54,7 @@ api.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                const res = await api.post("/auth/refresh");
+                const res = await refreshApi.post("/auth/refresh");
 
                 const newToken = res.data.accessToken;
                 localStorage.setItem("token", newToken);
