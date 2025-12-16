@@ -64,6 +64,7 @@ api.interceptors.response.use(
             } catch (err) {
                 processQueue(err, null);
                 localStorage.removeItem("token");
+                console.log("Session expired. Redirecting to login.");
                 window.location.href = "/auth/login";
                 return Promise.reject(err);
             } finally {

@@ -11,7 +11,7 @@ export default function UpcomingWeek({ refreshKey }) {
     const [ weekData, setWeekData ] = useState([]);
     const [ focusedDate, setFocusedDate ] = useState(startOfToday());
     const [ focusedOption, setFocusedOption ] = useState("schedule");
-
+    const [ selectedEvent, setSelectedEvent ] = useState(null);
 
     // get week data
     const today = startOfToday();
@@ -43,7 +43,6 @@ export default function UpcomingWeek({ refreshKey }) {
     const focusedData = weekData[focusedKey] || { tasks: [], events: [] };
 
     // handle selecting event
-    const [ selectedEvent, setSelectedEvent ] = useState(null);
     const handleSelectEvent = (event) => {
         setSelectedEvent(event);
     }
@@ -78,7 +77,7 @@ export default function UpcomingWeek({ refreshKey }) {
                             <Timeline events={focusedData.events} onSelectEvent={handleSelectEvent}/>
                         </div>
                         <div className={s.eventDetailsContainer}>
-                            {selectedEvent ? (
+                            {selectedEvent && isSameDay(selectedEvent?.start_time, focusedDate) ? (
                                 <div className={s.eventDetailsContent}>
                                     <div>
                                         <h1>{selectedEvent.name}</h1>
