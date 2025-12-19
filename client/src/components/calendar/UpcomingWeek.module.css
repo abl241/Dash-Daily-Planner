@@ -55,6 +55,13 @@
     margin-left: .5rem;
 }
 
+.eventHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .infoContainer {
     display: flex;
     flex-direction: row;
@@ -79,4 +86,19 @@
 .notesContainer {
     flex: 1;
     min-width: 0;
+}
+
+.editEventButton {
+    background: none;
+    align-self: center;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: #555;
+    transition: transform 0.2s, color 0.2s;
+}
+
+.editEventButton:hover {
+    transform: scale(1.05);
+    color: var(--primary-color);
 }
