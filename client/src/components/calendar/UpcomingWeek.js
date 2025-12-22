@@ -47,6 +47,7 @@ export default function UpcomingWeek({ refreshKey }) {
     const handleSelectEvent = (event) => {
         setSelectedEvent(event);
     }
+    console.log(selectedEvent)
 
     return (
         <div>
@@ -83,7 +84,11 @@ export default function UpcomingWeek({ refreshKey }) {
                                     <div className={s.eventDetailsContent}>
                                         <div className={s.eventHeader}>
                                             <h1>{selectedEvent.name}</h1>
-                                            {/* add category thing*/}
+
+                                            <div style={selectedEvent.original?.category_color ? {background: selectedEvent.original.category_color} : {}} className={s.categoryLabel}>
+                                                <p>{selectedEvent.original.category}</p>
+                                            </div>
+
                                             <button className={s.editEventButton}>
                                                 <FaPen />
                                             </button>

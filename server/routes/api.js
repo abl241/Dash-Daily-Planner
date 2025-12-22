@@ -313,28 +313,43 @@ router.get('/inrange', async (req, res) => {
 
         // Fetch base tasks and events (include recurring masters)
         const tasksQuery = `
-            SELECT *
-            FROM tasks
-            WHERE user_id = $1
-                AND (is_recurring = true OR (due_date::date BETWEEN $2::date AND $3::date))
-            ORDER BY due_date ASC;
+            SELECT
+                t.*,
+                c.color AS category_color
+            FROM tasks t
+            LEFT JOIN categories c
+                ON c.id = t.category_id
+                AND c.user_id = $1
+            WHERE t.user_id = $1
+                AND (
+                    t.is_recurring = true
+                    OR (t.due_date::date BETWEEN $2::date AND $3::date)
+                )
+            ORDER BY t.due_date ASC
         `;
 
+
         const eventsQuery = `
-            SELECT *
-            FROM events
-            WHERE user_id = $1
+            SELECT
+                e.*,
+                c.color AS category_color
+            FROM events e
+            LEFT JOIN categories c
+                ON c.id = e.category_id
+                AND c.user_id = $1
+            WHERE e.user_id = $1
                 AND (
-                    is_recurring = true
-                    OR start_time::date BETWEEN $2::date AND $3::date
-                    OR end_time::date BETWEEN $2::date AND $3::date
-                    OR (start_time::date <= $2::date AND end_time::date >= $3::date)
+                    e.is_recurring = true
+                    OR e.start_time::date BETWEEN $2::date AND $3::date
+                    OR e.end_time::date BETWEEN $2::date AND $3::date
+                    OR (e.start_time::date <= $2::date AND e.end_time::date >= $3::date)
                 )
-            ORDER BY start_time ASC;
+            ORDER BY e.start_time ASC
         `;
+
         const [tasksResult, eventsResult] = await Promise.all([
-                pool.query(tasksQuery, [userId, start, end]),
-                pool.query(eventsQuery, [userId, start, end]),
+            pool.query(tasksQuery, [userId, start, end]),
+            pool.query(eventsQuery, [userId, start, end]),
         ]);
 
         const baseTasks = tasksResult.rows || [];
