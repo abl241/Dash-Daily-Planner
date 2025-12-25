@@ -5,7 +5,41 @@ import Button from "./Button"
 import DropdownChecklist from "./DropdownChecklist";
 import CategoryAdder from "./CategoryAdder";
 
-export default function NewItemModal({ isOpen, onClose, onAdd }) {
+const today = new Date();
+const defaultDate = {
+    day: String(today.getDate()).padStart(2, "0"),
+    month: String(today.getMonth() + 1).padStart(2, "0"),
+    year: String(today.getFullYear()),
+};
+const getTomorrow = () => {
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return {
+        day: String(tomorrow.getDate()).padStart(2, "0"),
+        month: String(tomorrow.getMonth() + 1).padStart(2, "0"),
+        year: String(tomorrow.getFullYear()),
+    };
+};
+const tomorrowDate = getTomorrow();
+
+const emptyForm = {
+    title: "",
+    notes: "",
+    category: "",
+    category_id: null,
+    reminders: [],
+    repeat: false,
+    repeatRules: {unit: "days", interval: "", selectedDays: [], endRules: {type: "never", count: "", month: defaultDate.month, day: defaultDate.day, year: defaultDate.year}},
+    link: "",
+    //task specific
+    dueDate: {month: tomorrowDate.month, day: tomorrowDate.day, year: tomorrowDate.year, hour: "12", minute: "00", period: "AM"},
+    completeStatus: false,
+    //event specific
+    startTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
+    endTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
+};
+
+export default function NewItemModal({ isOpen, onClose, onAdd, mode, initialData }) {
     const [type, setType] = useState("task"); // "task" or "event"
     const [rows, setRows] = useState(2);
     const [repeat, setRepeat] = useState(false);
@@ -16,42 +50,111 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
     const [customReminder, setCustomReminder] = useState("");
     const [customReminderUnit, setCustomReminderUnit] = useState("minutes");
     const [customReminderValue, setCustomReminderValue] = useState(null);
-    
-    const today = new Date();
-    const defaultDate = {
-        day: String(today.getDate()).padStart(2, "0"),
-        month: String(today.getMonth() + 1).padStart(2, "0"),
-        year: String(today.getFullYear()),
-    };
-    const getTomorrow = () => {
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        return {
-            day: String(tomorrow.getDate()).padStart(2, "0"),
-            month: String(tomorrow.getMonth() + 1).padStart(2, "0"),
-            year: String(tomorrow.getFullYear()),
-        };
-    };
-    const tomorrowDate = getTomorrow();
-    
-    const [formData, setFormData] = useState({
-        title: "",
-        notes: "",
-        category: "",
-        category_id: null,
-        reminders: [],
-        repeat: false,
-        repeatRules: {unit: "days", interval: "", selectedDays: [], endRules: {type: "never", count: "", month: defaultDate.month, day: defaultDate.day, year: defaultDate.year}},
-        link: "",
-        //task specific
-        dueDate: {month: tomorrowDate.month, day: tomorrowDate.day, year: tomorrowDate.year, hour: "12", minute: "00", period: "AM"},
-        completeStatus: false,
-        //event specific
-        startTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
-        endTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
-    });
+
+    const [tempDate, setTempDate] = useState(emptyForm);
+    const [formData, setFormData] = useState(emptyForm);
     const modalRef = useRef(null);
     const savedForm = useRef(formData);
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        if (!initialData) {
+            const resetForm = { ...emptyForm };
+            setFormData(resetForm);
+            setTempDate(resetForm);
+            setType("task");
+            setRepeat(false);
+            setReminder(false);
+            setEndRepeatNever(true);
+            setEndRepeatAfter(false);
+            setEndRepeatOn(false);
+            return;
+        }
+
+        // Determine type
+        const itemType = initialData.due_date ? "task" : "event";
+        setType(itemType);
+
+        const isRepeating = initialData.is_recurring || false;
+        setRepeat(isRepeating);
+
+        const hasReminders = initialData.reminders && initialData.reminders.length > 0;
+        setReminder(hasReminders);
+
+        let parsedRepeatRules = { ...emptyForm.repeatRules };
+        if (initialData.repeat_rule) {
+            const rule = typeof initialData.repeat_rule === 'string' 
+                ? JSON.parse(initialData.repeat_rule) 
+                : initialData.repeat_rule;
+            
+            parsedRepeatRules = {
+                unit: rule.unit || "days",
+                interval: rule.interval || "",
+                selectedDays: rule.selectedDays || [],
+                endRules: rule.endRules || emptyForm.repeatRules.endRules
+            };
+
+            if (parsedRepeatRules.endRules.type === "never") {
+                setEndRepeatNever(true);
+                setEndRepeatAfter(false);
+                setEndRepeatOn(false);
+            } else if (parsedRepeatRules.endRules.type === "after") {
+                setEndRepeatNever(false);
+                setEndRepeatAfter(true);
+                setEndRepeatOn(false);
+            } else if (parsedRepeatRules.endRules.type === "on") {
+                setEndRepeatNever(false);
+                setEndRepeatAfter(false);
+                setEndRepeatOn(true);
+            }
+        }
+
+        const newFormData = {
+            title: initialData.name || "",
+            notes: initialData.notes || "",
+            category: initialData.category || "",
+            category_id: initialData.category_id || null,
+            reminders: initialData.reminders || [],
+            repeat: isRepeating,
+            link: initialData.link || "",
+            completeStatus: initialData.is_completed || false,
+            repeatRules: parsedRepeatRules,
+            dueDate: initialData.due_date
+                ? parseDateTimeToForm(initialData.due_date)
+                : emptyForm.dueDate,
+            startTime: initialData.start_time
+                ? parseDateTimeToForm(initialData.start_time)
+                : emptyForm.startTime,
+            endTime: initialData.end_time
+                ? parseDateTimeToForm(initialData.end_time)
+                : emptyForm.endTime,
+        };
+
+        setFormData(newFormData);
+        setTempDate(newFormData);
+        console.log("Setting formData from initialData:", newFormData);
+        console.log("fomrData", formData)
+        console.log("tempdate", tempDate)
+    }, [isOpen, initialData]);
+
+    function parseDateTimeToForm(isoString) {
+        const d = new Date(isoString);
+
+        const hour24 = d.getHours();
+        const hour = hour24 % 12 || 12;
+        const period = hour24 >= 12 ? "PM" : "AM";
+
+        return {
+            month: String(d.getMonth() + 1).padStart(2, "0"),  // ✅ Padded string
+            day: String(d.getDate()).padStart(2, "0"),         // ✅ Padded string
+            year: String(d.getFullYear()),                     // ✅ String
+            hour: String(hour).padStart(2, "0"),               // ✅ Padded string
+            minute: String(d.getMinutes()).padStart(2, "0"),   // ✅ Padded string
+            period
+        };
+    }
+
 
     // Detect clicks outside modal, close if so
     const handleClose = () => {
@@ -124,12 +227,6 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             ...prev, repeat: !repeat,
         }));
      };
-
-    // Logic and handlers for time or date change
-    const [tempDate, setTempDate] = useState(formData);
-    useEffect(() => {
-        if (isOpen) setTempDate(formData);
-    }, [isOpen, formData]);
 
     const pad = (val) => {
         if (!val) return "";
@@ -294,15 +391,6 @@ export default function NewItemModal({ isOpen, onClose, onAdd }) {
             return newTemp;
         });
     };
-
-    // Preserve form data when modal is closed and reopened
-    useEffect(() => {
-        if (isOpen) {
-            setFormData(savedForm.current);
-        } else {
-            savedForm.current = formData;
-        }
-    }, [isOpen]);
 
     // handlers for changing reminders
     const toggleReminder = (val) => {

@@ -7,12 +7,14 @@ import api from "./../../api/axios";
 import Day from "./Day";
 import Timeline from "./Timeline";
 import Button from "../Button";
+import NewItemModal from "../NewItemModal";
 
 export default function UpcomingWeek({ refreshKey }) {
     const [ weekData, setWeekData ] = useState([]);
     const [ focusedDate, setFocusedDate ] = useState(startOfToday());
     const [ focusedOption, setFocusedOption ] = useState("schedule");
     const [ selectedEvent, setSelectedEvent ] = useState(null);
+    const [ isModalOpen, setIsModalOpen ] = useState(false);
 
     // get week data
     const today = startOfToday();
@@ -47,7 +49,6 @@ export default function UpcomingWeek({ refreshKey }) {
     const handleSelectEvent = (event) => {
         setSelectedEvent(event);
     }
-    console.log(selectedEvent)
 
     return (
         <div>
@@ -89,7 +90,7 @@ export default function UpcomingWeek({ refreshKey }) {
                                                 <p>{selectedEvent.original.category}</p>
                                             </div>
 
-                                            <button className={s.editEventButton}>
+                                            <button className={s.editEventButton} onClick={()=> setIsModalOpen(true)}>
                                                 <FaPen />
                                             </button>
                                         </div>
@@ -121,6 +122,13 @@ export default function UpcomingWeek({ refreshKey }) {
                     </div>
                 )}
             </div>
+            <NewItemModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onAdd={() => {}}
+                mode={"edit"}
+                initialData={selectedEvent ? selectedEvent.original : null}
+            />
         </div>
     );
 }

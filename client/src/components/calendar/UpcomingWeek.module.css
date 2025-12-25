@@ -62,6 +62,14 @@
     align-items: center;
 }
 
+.categoryLabel {
+    padding: .2rem .5rem;
+    border-radius: 1rem;
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
 .infoContainer {
     display: flex;
     flex-direction: row;
