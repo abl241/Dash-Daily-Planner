@@ -57,85 +57,98 @@ export default function NewItemModal({ isOpen, onClose, onAdd, mode, initialData
     const savedForm = useRef(formData);
 
     useEffect(() => {
-        if (!isOpen) return;
-
-        if (!initialData) {
-            const resetForm = { ...emptyForm };
-            setFormData(resetForm);
-            setTempDate(resetForm);
-            setType("task");
-            setRepeat(false);
-            setReminder(false);
-            setEndRepeatNever(true);
-            setEndRepeatAfter(false);
-            setEndRepeatOn(false);
+        if (!isOpen) {
+            // Save when closing
+            savedForm.current = formData;
             return;
         }
 
-        // Determine type
-        const itemType = initialData.due_date ? "task" : "event";
-        setType(itemType);
+        // If we have initialData, load it (editing mode)
+        if (initialData) {
+            // Determine type
+            const itemType = initialData.due_date ? "task" : "event";
+            setType(itemType);
 
-        const isRepeating = initialData.is_recurring || false;
-        setRepeat(isRepeating);
+            const isRepeating = initialData.is_recurring || false;
+            setRepeat(isRepeating);
 
-        const hasReminders = initialData.reminders && initialData.reminders.length > 0;
-        setReminder(hasReminders);
+            const hasReminders = initialData.reminders && initialData.reminders.length > 0;
+            setReminder(hasReminders);
 
-        let parsedRepeatRules = { ...emptyForm.repeatRules };
-        if (initialData.repeat_rule) {
-            const rule = typeof initialData.repeat_rule === 'string' 
-                ? JSON.parse(initialData.repeat_rule) 
-                : initialData.repeat_rule;
-            
-            parsedRepeatRules = {
-                unit: rule.unit || "days",
-                interval: rule.interval || "",
-                selectedDays: rule.selectedDays || [],
-                endRules: rule.endRules || emptyForm.repeatRules.endRules
+            let parsedRepeatRules = { ...emptyForm.repeatRules };
+            if (initialData.repeat_rule) {
+                const rule = typeof initialData.repeat_rule === 'string' 
+                    ? JSON.parse(initialData.repeat_rule) 
+                    : initialData.repeat_rule;
+                
+                parsedRepeatRules = {
+                    unit: rule.unit || "days",
+                    interval: rule.interval || "",
+                    selectedDays: rule.selectedDays || [],
+                    endRules: rule.endRules || emptyForm.repeatRules.endRules
+                };
+
+                if (parsedRepeatRules.endRules.type === "never") {
+                    setEndRepeatNever(true);
+                    setEndRepeatAfter(false);
+                    setEndRepeatOn(false);
+                } else if (parsedRepeatRules.endRules.type === "after") {
+                    setEndRepeatNever(false);
+                    setEndRepeatAfter(true);
+                    setEndRepeatOn(false);
+                } else if (parsedRepeatRules.endRules.type === "on") {
+                    setEndRepeatNever(false);
+                    setEndRepeatAfter(false);
+                    setEndRepeatOn(true);
+                }
+            }
+
+            const newFormData = {
+                title: initialData.name || "",
+                notes: initialData.notes || "",
+                category: initialData.category || "",
+                category_id: initialData.category_id || null,
+                reminders: initialData.reminders || [],
+                repeat: isRepeating,
+                link: initialData.link || "",
+                completeStatus: initialData.is_completed || false,
+                repeatRules: parsedRepeatRules,
+                dueDate: initialData.due_date
+                    ? parseDateTimeToForm(initialData.due_date)
+                    : emptyForm.dueDate,
+                startTime: initialData.start_time
+                    ? parseDateTimeToForm(initialData.start_time)
+                    : emptyForm.startTime,
+                endTime: initialData.end_time
+                    ? parseDateTimeToForm(initialData.end_time)
+                    : emptyForm.endTime,
             };
 
-            if (parsedRepeatRules.endRules.type === "never") {
-                setEndRepeatNever(true);
-                setEndRepeatAfter(false);
-                setEndRepeatOn(false);
-            } else if (parsedRepeatRules.endRules.type === "after") {
-                setEndRepeatNever(false);
-                setEndRepeatAfter(true);
-                setEndRepeatOn(false);
-            } else if (parsedRepeatRules.endRules.type === "on") {
-                setEndRepeatNever(false);
-                setEndRepeatAfter(false);
-                setEndRepeatOn(true);
-            }
+            setFormData(newFormData);
+            setTempDate(newFormData);
+            return;
         }
 
-        const newFormData = {
-            title: initialData.name || "",
-            notes: initialData.notes || "",
-            category: initialData.category || "",
-            category_id: initialData.category_id || null,
-            reminders: initialData.reminders || [],
-            repeat: isRepeating,
-            link: initialData.link || "",
-            completeStatus: initialData.is_completed || false,
-            repeatRules: parsedRepeatRules,
-            dueDate: initialData.due_date
-                ? parseDateTimeToForm(initialData.due_date)
-                : emptyForm.dueDate,
-            startTime: initialData.start_time
-                ? parseDateTimeToForm(initialData.start_time)
-                : emptyForm.startTime,
-            endTime: initialData.end_time
-                ? parseDateTimeToForm(initialData.end_time)
-                : emptyForm.endTime,
-        };
-
-        setFormData(newFormData);
-        setTempDate(newFormData);
-        console.log("Setting formData from initialData:", newFormData);
-        console.log("fomrData", formData)
-        console.log("tempdate", tempDate)
+        // No initialData: restore saved form or use empty form (new item mode)
+        const hasUnsavedData = savedForm.current && savedForm.current.title;
+        const dataToLoad = hasUnsavedData ? savedForm.current : { ...emptyForm };
+        
+        setFormData(dataToLoad);
+        setTempDate(dataToLoad);
+        setType("task");
+        setRepeat(dataToLoad.repeat || false);
+        setReminder(dataToLoad.reminders?.length > 0 || false);
+        
+        // Set repeat end toggles based on saved data
+        if (dataToLoad.repeatRules?.endRules?.type) {
+            setEndRepeatNever(dataToLoad.repeatRules.endRules.type === "never");
+            setEndRepeatAfter(dataToLoad.repeatRules.endRules.type === "after");
+            setEndRepeatOn(dataToLoad.repeatRules.endRules.type === "on");
+        } else {
+            setEndRepeatNever(true);
+            setEndRepeatAfter(false);
+            setEndRepeatOn(false);
+        }
     }, [isOpen, initialData]);
 
     function parseDateTimeToForm(isoString) {
