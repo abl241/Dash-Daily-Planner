@@ -644,11 +644,20 @@ export default function NewItemModal({ isOpen, onClose, onAdd, mode, initialData
             <div className={s.modalContent} ref={modalRef}>
                 <form autoComplete="off" autoCorrect="off" spellCheck="off">
                     <div className={s.toggleTypeContainer}>
-                        <div className={s.toggleGroup}>
-                            <h2>Add a New:</h2>
-                            <Button onClick={() => setType("task")} className={`${s.toggleButton} ${type === "task" ? s.active : ""}`}>Task</Button>
-                            <Button onClick={() => setType("event")} className={`${s.toggleButton} ${type === "event" ? s.active : ""}`}>Event</Button>
-                        </div>
+                        {mode==="new" && (
+                            <div className={s.toggleGroup}>
+                                <h2>Add a New:</h2>
+                                <Button onClick={() => setType("task")} className={`${s.toggleButton} ${type === "task" ? s.active : ""}`}>Task</Button>
+                                <Button onClick={() => setType("event")} className={`${s.toggleButton} ${type === "event" ? s.active : ""}`}>Event</Button>
+                            </div>
+                        )}
+                        {mode==="edit" && (
+                            <div className={s.toggleGroup}>
+                                <h2>Edit:</h2>
+                                <Button onClick={() => setType("task")} className={`${s.toggleButton} ${type === "task" ? s.active : ""}`} disabled>Task</Button>
+                                <Button onClick={() => setType("event")} className={`${s.toggleButton} ${type === "event" ? s.active : ""}`} disabled>Event</Button>
+                            </div>
+                        )}
                         <Button variant="alert" onClick={handleClose} className={s.xButton}>X</Button>
                     </div>
 
@@ -843,7 +852,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd, mode, initialData
                         </div>
                     </div>
                             <Button onClick={() => console.log(formData)}>log formData</Button>
-                            <Button onClick={handleSubmit}>Submit</Button>
+                            <Button onClick={handleSubmit}>{mode === "edit" ? "Confirm" : "Create"}</Button>
                 </form>
             </div>
         </div>

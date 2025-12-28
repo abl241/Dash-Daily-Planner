@@ -57,7 +57,7 @@ export default function Dashboard() {
                     {/* insert overview components here */}
                     <UpcomingWeek refreshKey={refreshKey}/>
                     <Button variant="primary" onClick={() => setIsModalOpen(true)}>Add New</Button>
-                    <NewItemModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={handleAdd}/>
+                    <NewItemModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={handleAdd} mode="new"/>
                 </div>
 
                 <div className={s.addButtonSection}> {/* or just put button here */}
