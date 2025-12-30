@@ -50,6 +50,21 @@ export default function UpcomingWeek({ refreshKey }) {
         setSelectedEvent(event);
     }
 
+    const handleEdit = async (data, type) => { // add handler for reminders (add to separate reminders table)
+        try {
+            if(type === "task") {
+                const updatedTask = await api.put(`/tasks/${data.id}`, data);
+                console.log("Task edited:", updatedTask.data);
+            } else if(type === "event") {
+                const updatedEvent = await api.put(`/events${data.id}`, data);
+                console.log("Event edited:", updatedEvent.data);
+            }
+        } catch (err) {
+            console.error("Error editing item:", err);
+        }
+
+    };
+
     return (
         <div>
             <div className={s.weekContainer}>
@@ -125,7 +140,7 @@ export default function UpcomingWeek({ refreshKey }) {
             <NewItemModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onAdd={() => {}}
+                onAdd={() => {handleEdit}}
                 mode={"edit"}
                 initialData={selectedEvent ? selectedEvent.original : null}
             />
