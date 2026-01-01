@@ -10,16 +10,32 @@ import api from '../../../api/axios';
 import UpcomingWeek from "../../../components/calendar/UpcomingWeek";
 import NewItemModal from "../../../components/NewItemModal";
 import Button from "../../../components/Button";
+import { set } from "date-fns";
 
 export default function Dashboard() {
     const [ refreshKey, setRefreshKey ] = useState(0);
+    const [ isModalOpen, setIsModalOpen ] = useState(false);
+    const [ modalMode, setModalMode ] = useState("create"); // "create" | "edit"
+    const [ selectedItem, setSelectedItem ] = useState(null);
+
+    function handleCreate(type) {
+        setSelectedItem(null);
+        setModalMode("create");
+        setIsModalOpen(true);
+    }
+    function handleEdit(item) {
+        setSelectedItem(item);
+        setModalMode("edit");
+        setIsModalOpen(true);
+    }
+
+
     
     // layout stuff
     const [layout, setLayout] = useState([
         { i: "pomodoro", x: 0, y: 0, w: 3, h: 2 }, // temporary
         { i: "goal", x: 3, y: 0, w: 3, h: 2 },
     ]);
-    const [ isModalOpen, setIsModalOpen ] = useState(false);
 
     const handleLayoutChange = (newLayout) => {
         setLayout(newLayout);
@@ -34,19 +50,34 @@ export default function Dashboard() {
     }, []);
 
     // modal stuff
-    const handleAdd = async (data, type) => { // add handler for reminders (add to separate reminders table)
-        try {
-            if(type === "task") {
-                const newTask = await api.post("/tasks", data);
-                console.log("New task added:", newTask.data);
-            } else if(type === "event") {
-                const newEvent = await api.post("/events", data);
-                console.log("New event added:", newEvent.data);
+    const handleSubmit = async (data, type) => { // add handler for reminders (add to separate reminders table)
+        if(modalMode === "edit") {
+            try {
+                if(type === "task") {
+                    const updatedTask = await api.put(`/tasks/${data.id}`, data);
+                    console.log("Task edited:", updatedTask.data);
+                } else if(type === "event") {
+                    const updatedEvent = await api.put(`/events/${data.id}`, data);
+                    console.log("Event edited:", updatedEvent.data);
+                }
+            } catch (err) {
+                console.error("Error editing item:", err);
             }
-        } catch (err) {
-            console.error("Error adding new item:", err);
+        } else {
+            try {
+                if(type === "task") {
+                    const newTask = await api.post("/tasks", data);
+                    console.log("New task added:", newTask.data);
+                } else if(type === "event") {
+                    const newEvent = await api.post("/events", data);
+                    console.log("New event added:", newEvent.data);
+                }
+            } catch (err) {
+                console.error("Error adding new item:", err);
+            }
         }
         setRefreshKey(prev => prev + 1);
+        setIsModalOpen(false);
     };
 
 
@@ -55,9 +86,15 @@ export default function Dashboard() {
             <section className={s.mainSection}>
                 <div className={s.upcomingWeekSection}>
                     {/* insert overview components here */}
-                    <UpcomingWeek refreshKey={refreshKey}/>
+                    <UpcomingWeek refreshKey={refreshKey} onEditItem={handleEdit}/>
                     <Button variant="primary" onClick={() => setIsModalOpen(true)}>Add New</Button>
-                    <NewItemModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={handleAdd} mode="new"/>
+                    <NewItemModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onSubmit={handleSubmit}
+                    mode={modalMode}
+                    initialData={selectedItem}
+                    />
                 </div>
 
                 <div className={s.addButtonSection}> {/* or just put button here */}

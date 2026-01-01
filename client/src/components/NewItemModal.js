@@ -39,7 +39,7 @@ const emptyForm = {
     endTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
 };
 
-export default function NewItemModal({ isOpen, onClose, onAdd, mode, initialData }) {
+export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialData }) {
     const [type, setType] = useState("task"); // "task" or "event"
     const [rows, setRows] = useState(2);
     const [repeat, setRepeat] = useState(false);
@@ -59,7 +59,9 @@ export default function NewItemModal({ isOpen, onClose, onAdd, mode, initialData
     useEffect(() => {
         if (!isOpen) {
             // Save when closing
-            savedForm.current = formData;
+            if (mode === "create") {
+                savedForm.current = formData;
+            }
             return;
         }
 
@@ -130,24 +132,25 @@ export default function NewItemModal({ isOpen, onClose, onAdd, mode, initialData
         }
 
         // No initialData: restore saved form or use empty form (new item mode)
-        const hasUnsavedData = savedForm.current && savedForm.current.title;
-        const dataToLoad = hasUnsavedData ? savedForm.current : { ...emptyForm };
-        
-        setFormData(dataToLoad);
-        setTempDate(dataToLoad);
-        setType("task");
-        setRepeat(dataToLoad.repeat || false);
-        setReminder(dataToLoad.reminders?.length > 0 || false);
-        
-        // Set repeat end toggles based on saved data
-        if (dataToLoad.repeatRules?.endRules?.type) {
-            setEndRepeatNever(dataToLoad.repeatRules.endRules.type === "never");
-            setEndRepeatAfter(dataToLoad.repeatRules.endRules.type === "after");
-            setEndRepeatOn(dataToLoad.repeatRules.endRules.type === "on");
-        } else {
-            setEndRepeatNever(true);
-            setEndRepeatAfter(false);
-            setEndRepeatOn(false);
+        if (mode === "create") {
+            const hasUnsavedData = savedForm.current && savedForm.current.title;
+            const dataToLoad = hasUnsavedData ? savedForm.current : { ...emptyForm };
+
+            setFormData(dataToLoad);
+            setTempDate(dataToLoad);
+            setType("task");
+            setRepeat(dataToLoad.repeat || false);
+            setReminder(dataToLoad.reminders?.length > 0 || false);
+
+            if (dataToLoad.repeatRules?.endRules?.type) {
+                setEndRepeatNever(dataToLoad.repeatRules.endRules.type === "never");
+                setEndRepeatAfter(dataToLoad.repeatRules.endRules.type === "after");
+                setEndRepeatOn(dataToLoad.repeatRules.endRules.type === "on");
+            } else {
+                setEndRepeatNever(true);
+                setEndRepeatAfter(false);
+                setEndRepeatOn(false);
+            }
         }
     }, [isOpen, initialData]);
 
@@ -617,7 +620,7 @@ export default function NewItemModal({ isOpen, onClose, onAdd, mode, initialData
         }
 
 
-        onAdd(formData, type); // fix bug for adding new item after submitting
+        onSubmit(formData, type); // fix bug for adding new item after submitting
         setFormData({
             title: "",
             notes: "",
@@ -633,7 +636,9 @@ export default function NewItemModal({ isOpen, onClose, onAdd, mode, initialData
             startTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
             endTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
         });
-        savedForm.current = submissionData;
+        if (mode === "create") {
+            savedForm.current = emptyForm;
+        }
         console.log("Submitted data:", submissionData);
         onClose();
     };

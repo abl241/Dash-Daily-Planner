@@ -6,15 +6,13 @@ import api from "./../../api/axios";
 
 import Day from "./Day";
 import Timeline from "./Timeline";
-import Button from "../Button";
-import NewItemModal from "../NewItemModal";
 
-export default function UpcomingWeek({ refreshKey }) {
+
+export default function UpcomingWeek({ refreshKey, onEditItem }) {
     const [ weekData, setWeekData ] = useState([]);
     const [ focusedDate, setFocusedDate ] = useState(startOfToday());
     const [ focusedOption, setFocusedOption ] = useState("schedule");
     const [ selectedEvent, setSelectedEvent ] = useState(null);
-    const [ isModalOpen, setIsModalOpen ] = useState(false);
 
     // get week data
     const today = startOfToday();
@@ -49,21 +47,6 @@ export default function UpcomingWeek({ refreshKey }) {
     const handleSelectEvent = (event) => {
         setSelectedEvent(event);
     }
-
-    const handleEdit = async (data, type) => { // add handler for reminders (add to separate reminders table)
-        try {
-            if(type === "task") {
-                const updatedTask = await api.put(`/tasks/${data.id}`, data);
-                console.log("Task edited:", updatedTask.data);
-            } else if(type === "event") {
-                const updatedEvent = await api.put(`/events${data.id}`, data);
-                console.log("Event edited:", updatedEvent.data);
-            }
-        } catch (err) {
-            console.error("Error editing item:", err);
-        }
-
-    };
 
     return (
         <div>
@@ -105,7 +88,7 @@ export default function UpcomingWeek({ refreshKey }) {
                                                 <p>{selectedEvent.original.category}</p>
                                             </div>
 
-                                            <button className={s.editEventButton} onClick={()=> setIsModalOpen(true)}>
+                                            <button className={s.editEventButton} onClick={() =>{ onEditItem(selectedEvent.original) }}>
                                                 <FaPen />
                                             </button>
                                         </div>
@@ -137,13 +120,6 @@ export default function UpcomingWeek({ refreshKey }) {
                     </div>
                 )}
             </div>
-            <NewItemModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onAdd={() => {handleEdit}}
-                mode={"edit"}
-                initialData={selectedEvent ? selectedEvent.original : null}
-            />
         </div>
     );
 }
