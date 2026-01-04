@@ -54,20 +54,43 @@ export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialD
     const [tempDate, setTempDate] = useState(emptyForm);
     const [formData, setFormData] = useState(emptyForm);
     const modalRef = useRef(null);
-    const savedForm = useRef(formData);
+    const savedCreateForm = useRef(formData);
+    const savedEditForm = useRef(null);
 
     useEffect(() => {
         if (!isOpen) {
-            // Save when closing
-            if (mode === "create") {
-                savedForm.current = formData;
+            // Save when closing - but ONLY save in create mode
+            if (mode === "create" && !initialData) {
+                savedCreateForm.current = formData;
+            } else if (mode === "edit" && initialData) {
+                savedEditForm.current = formData;
             }
             return;
         }
 
         // If we have initialData, load it (editing mode)
         if (initialData) {
-            // Determine type
+            const useSavedEdit = savedEditForm.current && savedEditForm.current.id === initialData.id;
+
+            if (useSavedEdit) {
+                setFormData(savedEditForm.current);
+                setTempDate(savedEditForm.current);
+                setType(savedEditForm.current.dueDate ? "task" : "event");
+                setRepeat(savedEditForm.current.repeat || false);
+                setReminder(savedEditForm.current.reminders?.length > 0 || false);
+                
+                if (savedEditForm.current.repeatRules?.endRules?.type) {
+                    setEndRepeatNever(savedEditForm.current.repeatRules.endRules.type === "never");
+                    setEndRepeatAfter(savedEditForm.current.repeatRules.endRules.type === "after");
+                    setEndRepeatOn(savedEditForm.current.repeatRules.endRules.type === "on");
+                } else {
+                    setEndRepeatNever(true);
+                    setEndRepeatAfter(false);
+                    setEndRepeatOn(false);
+                }
+                return;
+            }
+            // Fresh load from initialData
             const itemType = initialData.due_date ? "task" : "event";
             setType(itemType);
 
@@ -106,6 +129,7 @@ export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialD
             }
 
             const newFormData = {
+                id: initialData.id, // Include ID to track which item we're editing
                 title: initialData.name || "",
                 notes: initialData.notes || "",
                 category: initialData.category || "",
@@ -131,28 +155,26 @@ export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialD
             return;
         }
 
-        // No initialData: restore saved form or use empty form (new item mode)
-        if (mode === "create") {
-            const hasUnsavedData = savedForm.current && savedForm.current.title;
-            const dataToLoad = hasUnsavedData ? savedForm.current : { ...emptyForm };
-
-            setFormData(dataToLoad);
-            setTempDate(dataToLoad);
-            setType("task");
-            setRepeat(dataToLoad.repeat || false);
-            setReminder(dataToLoad.reminders?.length > 0 || false);
-
-            if (dataToLoad.repeatRules?.endRules?.type) {
-                setEndRepeatNever(dataToLoad.repeatRules.endRules.type === "never");
-                setEndRepeatAfter(dataToLoad.repeatRules.endRules.type === "after");
-                setEndRepeatOn(dataToLoad.repeatRules.endRules.type === "on");
-            } else {
-                setEndRepeatNever(true);
-                setEndRepeatAfter(false);
-                setEndRepeatOn(false);
-            }
+        // No initialData AND create mode: restore saved form or use empty form
+        const hasUnsavedData = savedCreateForm.current && savedCreateForm.current.title;
+        const dataToLoad = hasUnsavedData ? savedCreateForm.current : { ...emptyForm };
+        
+        setFormData(dataToLoad);
+        setTempDate(dataToLoad);
+        setType("task");
+        setRepeat(dataToLoad.repeat || false);
+        setReminder(dataToLoad.reminders?.length > 0 || false);
+        
+        if (dataToLoad.repeatRules?.endRules?.type) {
+            setEndRepeatNever(dataToLoad.repeatRules.endRules.type === "never");
+            setEndRepeatAfter(dataToLoad.repeatRules.endRules.type === "after");
+            setEndRepeatOn(dataToLoad.repeatRules.endRules.type === "on");
+        } else {
+            setEndRepeatNever(true);
+            setEndRepeatAfter(false);
+            setEndRepeatOn(false);
         }
-    }, [isOpen, initialData]);
+    }, [isOpen, initialData, mode]);
 
     function parseDateTimeToForm(isoString) {
         const d = new Date(isoString);
@@ -621,23 +643,14 @@ export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialD
 
 
         onSubmit(formData, type); // fix bug for adding new item after submitting
-        setFormData({
-            title: "",
-            notes: "",
-            category: "",
-            reminders: [],
-            repeat: false,
-            repeatRules: {unit: "days", interval: "", selectedDays: [], endRules: {type: "never", count: "", month: defaultDate.month, day: defaultDate.day, year: defaultDate.year}},
-            link: "",
-            //task specific
-            dueDate: {month: tomorrowDate.month, day: tomorrowDate.day, year: tomorrowDate.year, hour: "12", minute: "00", period: "AM"},
-            completeStatus: false,
-            //event specific
-            startTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
-            endTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
-        });
+        const resetForm = { ...emptyForm };
+        setFormData(resetForm);
+        setTempDate(resetForm);
+
         if (mode === "create") {
-            savedForm.current = emptyForm;
+            savedCreateForm.current = emptyForm;
+        } else if (mode === "edit") {
+            savedEditForm.current = null;
         }
         console.log("Submitted data:", submissionData);
         onClose();
@@ -649,7 +662,7 @@ export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialD
             <div className={s.modalContent} ref={modalRef}>
                 <form autoComplete="off" autoCorrect="off" spellCheck="off">
                     <div className={s.toggleTypeContainer}>
-                        {mode==="new" && (
+                        {mode==="create" && (
                             <div className={s.toggleGroup}>
                                 <h2>Add a New:</h2>
                                 <Button onClick={() => setType("task")} className={`${s.toggleButton} ${type === "task" ? s.active : ""}`}>Task</Button>
