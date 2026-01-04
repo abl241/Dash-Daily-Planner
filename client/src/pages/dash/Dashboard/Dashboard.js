@@ -19,17 +19,22 @@ export default function Dashboard() {
     const [ selectedItem, setSelectedItem ] = useState(null);
 
     function handleCreate(type) {
-        setSelectedItem(null);
-        setModalMode("create");
-        setIsModalOpen(true);
+        setIsModalOpen(false); // ✅ Close first
+        setTimeout(() => {
+            setSelectedItem(null);
+            setModalMode("create");
+            setIsModalOpen(true);
+        }, 50); // Small delay to ensure close completes
     }
+
     function handleEdit(item) {
-        setSelectedItem(item);
-        setModalMode("edit");
-        setIsModalOpen(true);
+        setIsModalOpen(false); // ✅ Close first
+        setTimeout(() => {
+            setSelectedItem(item);
+            setModalMode("edit");
+            setIsModalOpen(true);
+        }, 50); // Small delay to ensure close completes
     }
-
-
     
     // layout stuff
     const [layout, setLayout] = useState([
@@ -87,7 +92,7 @@ export default function Dashboard() {
                 <div className={s.upcomingWeekSection}>
                     {/* insert overview components here */}
                     <UpcomingWeek refreshKey={refreshKey} onEditItem={handleEdit}/>
-                    <Button variant="primary" onClick={() => setIsModalOpen(true)}>Add New</Button>
+                    <Button variant="primary" onClick={() => handleCreate()}>Add New</Button>
                     <NewItemModal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}

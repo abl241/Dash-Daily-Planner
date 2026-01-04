@@ -54,12 +54,33 @@ export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialD
     const [tempDate, setTempDate] = useState(emptyForm);
     const [formData, setFormData] = useState(emptyForm);
     const modalRef = useRef(null);
-    const savedCreateForm = useRef(formData);
+    const savedCreateForm = useRef(emptyForm);
     const savedEditForm = useRef(null);
+    const previousMode = useRef(mode); // Track previous mode
 
     useEffect(() => {
+    // Guard: Don't run if props are in an inconsistent state
+        if (isOpen && mode === "edit" && !initialData) {
+            console.log("⚠️ Waiting for initialData to sync with edit mode...");
+            return;
+        }
+        if (isOpen && mode === "create" && initialData) {
+            console.log("⚠️ Waiting for mode to sync (should be create but have initialData)...");
+            return;
+        }
+
+        // Clear opposite mode's saved form when mode changes
+        if (previousMode.current !== mode) {
+            if (mode === "create") {
+                savedEditForm.current = null;
+            } else if (mode === "edit") {
+                savedCreateForm.current = emptyForm;
+            }
+            previousMode.current = mode;
+        }
+
         if (!isOpen) {
-            // Save when closing - but ONLY save in create mode
+            // Save when closing
             if (mode === "create" && !initialData) {
                 savedCreateForm.current = formData;
             } else if (mode === "edit" && initialData) {
@@ -68,14 +89,17 @@ export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialD
             return;
         }
 
-        // If we have initialData, load it (editing mode)
+        // EDIT MODE: Load initialData
         if (initialData) {
-            const useSavedEdit = savedEditForm.current && savedEditForm.current.id === initialData.id;
-
+            const useSavedEdit = savedEditForm.current && 
+                                savedEditForm.current.id === initialData.id;
+            
             if (useSavedEdit) {
+                // Restore in-progress edits
                 setFormData(savedEditForm.current);
                 setTempDate(savedEditForm.current);
-                setType(savedEditForm.current.dueDate ? "task" : "event");
+                const itemType = savedEditForm.current.dueDate?.month ? "task" : "event";
+                setType(itemType);
                 setRepeat(savedEditForm.current.repeat || false);
                 setReminder(savedEditForm.current.reminders?.length > 0 || false);
                 
@@ -90,6 +114,7 @@ export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialD
                 }
                 return;
             }
+
             // Fresh load from initialData
             const itemType = initialData.due_date ? "task" : "event";
             setType(itemType);
@@ -129,7 +154,7 @@ export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialD
             }
 
             const newFormData = {
-                id: initialData.id, // Include ID to track which item we're editing
+                id: initialData.id,
                 title: initialData.name || "",
                 notes: initialData.notes || "",
                 category: initialData.category || "",
@@ -155,7 +180,7 @@ export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialD
             return;
         }
 
-        // No initialData AND create mode: restore saved form or use empty form
+        // CREATE MODE: Restore saved or use empty
         const hasUnsavedData = savedCreateForm.current && savedCreateForm.current.title;
         const dataToLoad = hasUnsavedData ? savedCreateForm.current : { ...emptyForm };
         
