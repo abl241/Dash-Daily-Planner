@@ -69,16 +69,6 @@ export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialD
             return;
         }
 
-        // Clear opposite mode's saved form when mode changes
-        if (previousMode.current !== mode) {
-            if (mode === "create") {
-                savedEditForm.current = null;
-            } else if (mode === "edit") {
-                savedCreateForm.current = emptyForm;
-            }
-            previousMode.current = mode;
-        }
-
         if (!isOpen) {
             // Save when closing
             if (mode === "create" && !initialData) {
