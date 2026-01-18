@@ -36,7 +36,7 @@ const emptyForm = {
     completeStatus: false,
     //event specific
     startTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
-    endTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "12", minute: "00", period: "PM"},
+    endTime: {month: defaultDate.month, day: defaultDate.day, year: defaultDate.year, hour: "1", minute: "00", period: "PM"},
 };
 
 export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialData }) {
