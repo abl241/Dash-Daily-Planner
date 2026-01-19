@@ -28,7 +28,13 @@ export default function UpcomingWeek({ refreshKey, onEditItem }) {
                 });
 
                 const { tasks, events } = res.data;
-                const grouped = groupByDate(tasks, events, start, end);
+                const normalizedEvents = events.map(e => ({
+                    ...e,
+                    original: e.original ?? e
+                }));
+
+                const grouped = groupByDate(tasks, normalizedEvents, start, end);
+                console.log("Grouped week data: ", grouped);
                 setWeekData(grouped);
             } catch (err) {
                 console.error("Error fetching week data: ", err.message);
@@ -37,7 +43,6 @@ export default function UpcomingWeek({ refreshKey, onEditItem }) {
 
         fetchWeekData();
     }, [ refreshKey ]);
-
     // handling day focus
     const handleFocus = (day) => setFocusedDate(day);
     const focusedKey = format(focusedDate, "yyyy-MM-dd");
