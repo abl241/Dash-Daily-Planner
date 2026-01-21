@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { FaPen } from "react-icons/fa";
 import { addDays, startOfToday, isSameDay, format } from "date-fns";
 import api from "./../../api/axios";
+import { getLocalDateKey } from "../../utils/dateUtils";
 
 import Day from "./Day";
 import Timeline from "./Timeline";
@@ -20,8 +21,9 @@ export default function UpcomingWeek({ refreshKey, onEditItem }) {
     useEffect(() => {
         const fetchWeekData = async () => {
             try {
-                const start = format(today, "yyyy-MM-dd");
-                const end = format(addDays(today, 6), "yyyy-MM-dd");
+                const start = getLocalDateKey(today);
+                const end = getLocalDateKey(addDays(today, 6));
+                console.log("Fetching week data from ", start, " to ", end);
 
                 const res = await api.get("/api/inrange", {
                     params: { start, end }

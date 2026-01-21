@@ -310,6 +310,7 @@ router.get('/inrange', async (req, res) => {
         // parse window bounds (treat incoming strings as ISO-like)
         const startWindow = startOfDay(new Date(start));
         const endWindow = endOfDay(new Date(end));
+        console.log('In-range request for user', userId, 'from', startWindow, 'to', endWindow);
 
         // Fetch base tasks and events (include recurring masters)
         const tasksQuery = `
