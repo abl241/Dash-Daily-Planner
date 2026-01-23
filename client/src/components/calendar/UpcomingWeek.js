@@ -23,7 +23,6 @@ export default function UpcomingWeek({ refreshKey, onEditItem }) {
             try {
                 const start = getLocalDateKey(today);
                 const end = getLocalDateKey(addDays(today, 6));
-                console.log("Fetching week data from ", start, " to ", end);
 
                 const res = await api.get("/api/inrange", {
                     params: { start, end }
@@ -42,7 +41,6 @@ export default function UpcomingWeek({ refreshKey, onEditItem }) {
                 console.error("Error fetching week data: ", err.message);
             }
         };
-
         fetchWeekData();
     }, [ refreshKey ]);
     // handling day focus
@@ -135,7 +133,7 @@ export default function UpcomingWeek({ refreshKey, onEditItem }) {
 function groupByDate(tasks, events, startString, endString) {
     const map = {};
 
-    const start = new Date(startString);
+    const start = new Date(`${startString}T00:00:00`);
     for (let i = 0; i < 7; i++) {
         const d = addDays(start, i);
         const key = format(d, "yyyy-MM-dd");
@@ -166,6 +164,19 @@ function groupByDate(tasks, events, startString, endString) {
 }
 
 function safeParse(dateString) {
+    if (!dateString) return null;
+
+    // If already date-only
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        return new Date(`${dateString}T00:00:00`);
+    }
+
     const d = new Date(dateString);
-    return isNaN(d) ? null : d;
+
+    // Normalize to local date (strip time)
+    return isNaN(d) ? null : new Date(
+        d.getFullYear(),
+        d.getMonth(),
+        d.getDate()
+    );
 }

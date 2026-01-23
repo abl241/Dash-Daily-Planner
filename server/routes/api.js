@@ -307,9 +307,16 @@ router.get('/inrange', async (req, res) => {
             return res.status(400).json({ message: 'Start and end dates required' });
         }
 
+        // helper to parse "YYYY-MM-DD" to Date at local midnight
+        function parseLocalDate(dateKey) {
+            const [year, month, day] = dateKey.split("-").map(Number);
+            return new Date(year, month - 1, day);
+        }
+
         // parse window bounds (treat incoming strings as ISO-like)
-        const startWindow = startOfDay(new Date(start));
-        const endWindow = endOfDay(new Date(end));
+        const startWindow = startOfDay(parseLocalDate(start));
+        const endWindow = endOfDay(parseLocalDate(end));
+
         console.log('In-range request for user', userId, 'from', startWindow, 'to', endWindow);
 
         // Fetch base tasks and events (include recurring masters)
@@ -349,8 +356,8 @@ router.get('/inrange', async (req, res) => {
         `;
 
         const [tasksResult, eventsResult] = await Promise.all([
-            pool.query(tasksQuery, [userId, start, end]),
-            pool.query(eventsQuery, [userId, start, end]),
+            pool.query(tasksQuery, [userId, startWindow, endWindow]),
+            pool.query(eventsQuery, [userId, startWindow, endWindow]),
         ]);
 
         const baseTasks = tasksResult.rows || [];
