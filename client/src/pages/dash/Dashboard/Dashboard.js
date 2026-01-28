@@ -94,11 +94,11 @@ export default function Dashboard() {
                     <UpcomingWeek refreshKey={refreshKey} onEditItem={handleEdit}/>
                     <Button variant="primary" onClick={() => handleCreate()}>Add New</Button>
                     <NewItemModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    onSubmit={handleSubmit}
-                    mode={modalMode}
-                    initialData={selectedItem}
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        onSubmit={handleSubmit}
+                        mode={modalMode}
+                        initialData={selectedItem}
                     />
                 </div>
 

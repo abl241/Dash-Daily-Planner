@@ -35,7 +35,6 @@ export default function UpcomingWeek({ refreshKey, onEditItem }) {
                 }));
 
                 const grouped = groupByDate(tasks, normalizedEvents, start, end);
-                console.log("Grouped week data: ", grouped);
                 setWeekData(grouped);
             } catch (err) {
                 console.error("Error fetching week data: ", err.message);

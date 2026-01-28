@@ -657,7 +657,7 @@ export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialD
         }
 
 
-        onSubmit(formData, type); // fix bug for adding new item after submitting
+        onSubmit(formData, type); // differentiate between edit and create in onSubmit handler
         const resetForm = { ...emptyForm };
         setFormData(resetForm);
         setTempDate(resetForm);
