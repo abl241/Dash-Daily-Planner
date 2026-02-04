@@ -12,6 +12,8 @@ import NewItemModal from "../../../components/NewItemModal";
 import Button from "../../../components/Button";
 import { set } from "date-fns";
 
+import { buildTimestamp, normalizeRepeatRule } from "../../../utils/dateUtils";
+
 export default function Dashboard() {
     const [ refreshKey, setRefreshKey ] = useState(0);
     const [ isModalOpen, setIsModalOpen ] = useState(false);
@@ -62,7 +64,15 @@ export default function Dashboard() {
                     const updatedTask = await api.put(`/tasks/${data.id}`, data);
                     console.log("Task edited:", updatedTask.data);
                 } else if(type === "event") {
-                    const updatedEvent = await api.put(`/events/${data.id}`, data);
+                    const payload = {
+                        ...data,
+                        name: data.title,
+                        start_time: buildTimestamp(data.startTime),
+                        end_time: buildTimestamp(data.endTime),
+                        repeat_rule: normalizeRepeatRule(data.repeat_rule)
+                    };
+                    console.log("Editing event with payload:", payload);
+                    const updatedEvent = await api.put(`/events/${payload.id}`, payload);
                     console.log("Event edited:", updatedEvent.data);
                 }
             } catch (err) {

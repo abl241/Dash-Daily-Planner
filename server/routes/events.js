@@ -137,6 +137,7 @@ router.delete('/:id', async (req, res) => {
 // ************************************************* Update an event by ID **********************************************************
 
 router.put('/:id', async (req, res) => {
+    console.log('Update event request body:', req.body);
     try {
         const userId = req.user.id;
         const { id } = req.params;
@@ -157,7 +158,7 @@ router.put('/:id', async (req, res) => {
             start_time = COALESCE($2, start_time),
             end_time = COALESCE($3, end_time),
             category = COALESCE($4, category),
-            category_id = $5,
+            category_id = COALESCE($5, category_id),
             notes = COALESCE($6, notes),
             is_recurring = COALESCE($7, is_recurring),
             repeat_rule = COALESCE($8, repeat_rule),
