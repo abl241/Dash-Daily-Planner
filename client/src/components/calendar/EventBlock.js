@@ -10,9 +10,10 @@ export default function EventBlock({ event, onSelectEvent, top, height, left, wi
             height: `${height}px`,
             left: `${left}px`,
             width: `${width}px`,
+            background: event.is_occurrence ? event.original.category_color : event.category_color
         }}
         >
-            {event.name}
+            {event.is_occurrence ? event.original.name : event.name}
         </div>
     );
 }
