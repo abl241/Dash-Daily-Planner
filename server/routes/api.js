@@ -147,8 +147,6 @@ function handleOccurrence(occDate) {
             out.push({
                 master_id: item.id,
                 occurrence_date: occDate,
-                name: item.name,
-                notes: item.notes,
                 original: item,
                 is_occurrence: true,
             });
@@ -161,8 +159,6 @@ function handleOccurrence(occDate) {
                 master_id: item.id,
                 start_time: occDate,
                 end_time: new Date(occDate.getTime() + durationMs),
-                name: item.name,
-                location: item.location,
                 original: item,
                 is_occurrence: true,
             });
