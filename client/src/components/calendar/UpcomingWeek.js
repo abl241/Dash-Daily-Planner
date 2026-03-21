@@ -1,19 +1,26 @@
 import s from "./UpcomingWeek.module.css";
 import React, { useState, useEffect } from "react";
 import { FaPen } from "react-icons/fa";
-import { addDays, startOfToday, isSameDay, format } from "date-fns";
+import { addDays, startOfToday, isSameDay, format, set } from "date-fns";
 import api from "./../../api/axios";
 import { getLocalDateKey } from "../../utils/dateUtils";
 
 import Day from "./Day";
 import Timeline from "./Timeline";
+import Button from "../Button";
 
 
-export default function UpcomingWeek({ refreshKey, onEditItem }) {
+export default function UpcomingWeek({ refreshKey, onEditItem, upcomingWeekSelectedEvent }) {
     const [ weekData, setWeekData ] = useState([]);
     const [ focusedDate, setFocusedDate ] = useState(startOfToday());
     const [ focusedOption, setFocusedOption ] = useState("schedule");
     const [ selectedEvent, setSelectedEvent ] = useState(null);
+
+    useEffect(() => {
+        if (upcomingWeekSelectedEvent) {
+            setSelectedEvent(upcomingWeekSelectedEvent);
+        }
+    }, [ upcomingWeekSelectedEvent ]);
 
     // get week data
     const today = startOfToday();
@@ -54,6 +61,7 @@ export default function UpcomingWeek({ refreshKey, onEditItem }) {
 
     return (
         <div>
+            <Button onClick={()=> console.log(weekData)}/>
             <div className={s.weekContainer}>
                 {days.map((day) => {
                     const key = format(day, "yyyy-MM-dd");
@@ -86,9 +94,9 @@ export default function UpcomingWeek({ refreshKey, onEditItem }) {
                                 <>
                                     <div className={s.eventDetailsContent}>
                                         <div className={s.eventHeader}>
-                                            <h1>{selectedEvent.name}</h1>
+                                            <h1>{selectedEvent.is_occurrence ? selectedEvent.original.name : selectedEvent.name}</h1>
 
-                                            <div style={selectedEvent.original?.category_color ? {background: selectedEvent.original.category_color} : {}} className={s.categoryLabel}>
+                                            <div style={{ background: selectedEvent.is_occurrence ? selectedEvent.original?.category_color : selectedEvent.category_color }} className={s.categoryLabel}>
                                                 <p>{selectedEvent.original.category}</p>
                                             </div>
 

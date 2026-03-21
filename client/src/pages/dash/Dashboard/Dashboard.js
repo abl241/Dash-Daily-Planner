@@ -19,6 +19,7 @@ export default function Dashboard() {
     const [ isModalOpen, setIsModalOpen ] = useState(false);
     const [ modalMode, setModalMode ] = useState("create"); // "create" | "edit"
     const [ selectedItem, setSelectedItem ] = useState(null);
+    const [ upcomingWeekSelectedEvent, setUpcomingWeekSelectedEvent ] = useState(null);
 
     function handleCreate(type) {
         setIsModalOpen(false); // ✅ Close first
@@ -57,8 +58,13 @@ export default function Dashboard() {
     }, []);
 
     // modal stuff
+
     const handleSubmit = async (data, type) => { // add handler for reminders (add to separate reminders table)
         if(modalMode === "edit") {
+            // for repeating events, ask just this event, or all future events
+            if(type === "event" && data.is_recurring) {
+                const applyToAll = window.confirm("This is a recurring event. Do you want to apply changes to all future occurrences? Click 'Cancel' to edit just this occurrence.");
+
             try {
                 if(type === "task") {
                     const updatedTask = await api.put(`/tasks/${data.id}`, data);
@@ -71,9 +77,10 @@ export default function Dashboard() {
                         end_time: buildTimestamp(data.endTime),
                         repeat_rule: normalizeRepeatRule(data.repeat_rule)
                     };
-                    console.log("Editing event with payload:", payload);
+                    // console.log("Editing event with payload:", payload);
                     const updatedEvent = await api.put(`/events/${payload.id}`, payload);
-                    console.log("Event edited:", updatedEvent.data);
+                    // console.log("Event edited:", updatedEvent.data);
+                    setUpcomingWeekSelectedEvent(updatedEvent.data); // update selected event in UpcomingWeek
                 }
             } catch (err) {
                 console.error("Error editing item:", err);
@@ -95,13 +102,12 @@ export default function Dashboard() {
         setIsModalOpen(false);
     };
 
-
     return (
         <div className={s.dashboardContainer}>
             <section className={s.mainSection}>
                 <div className={s.upcomingWeekSection}>
                     {/* insert overview components here */}
-                    <UpcomingWeek refreshKey={refreshKey} onEditItem={handleEdit}/>
+                    <UpcomingWeek refreshKey={refreshKey} onEditItem={handleEdit} upcomingWeekSelectedEvent={upcomingWeekSelectedEvent}/>
                     <Button variant="primary" onClick={() => handleCreate()}>Add New</Button>
                     <NewItemModal
                         isOpen={isModalOpen}

@@ -667,7 +667,7 @@ export default function NewItemModal({ isOpen, onClose, onSubmit, mode, initialD
         } else if (mode === "edit") {
             savedEditForm.current = null;
         }
-        console.log("Submitted data:", submissionData);
+        // console.log("Submitted data:", submissionData);
         onClose();
     };
 
