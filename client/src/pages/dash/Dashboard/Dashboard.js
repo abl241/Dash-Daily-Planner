@@ -64,6 +64,7 @@ export default function Dashboard() {
             // for repeating events, ask just this event, or all future events
             if(type === "event" && data.is_recurring) {
                 const applyToAll = window.confirm("This is a recurring event. Do you want to apply changes to all future occurrences? Click 'Cancel' to edit just this occurrence.");
+            }
 
             try {
                 if(type === "task") {
